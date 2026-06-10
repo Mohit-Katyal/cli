@@ -1165,6 +1165,139 @@ func reportHasSessionRecommendation(report sessionTokensReport, id string) bool 
 	return false
 }
 
+func TestTokensCmd_AgentBriefPrioritizesNextAction(t *testing.T) {
+	setupStopTestRepo(t)
+
+	ctx := context.Background()
+	state := makeSessionState("test-tokens-brief", session.PhaseActive)
+	state.AgentType = testAgentClaude
+	state.TokenUsage = &agent.TokenUsage{
+		InputTokens:         94,
+		CacheCreationTokens: 122171,
+		CacheReadTokens:     6052424,
+		OutputTokens:        38956,
+		APICallCount:        70,
+	}
+
+	if err := strategy.SaveSessionState(ctx, state); err != nil {
+		t.Fatalf("SaveSessionState() error = %v", err)
+	}
+
+	cmd := newTokensCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"test-tokens-brief", "--agent-brief"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Session token brief",
+		"Session: test-tokens-brief",
+		"Token usage: 6213.6k total; 97.4% cache/context replay; 70 API calls.",
+		"Next best action:",
+		"Summarize the useful findings, then batch the next diagnostic step.",
+		"Signals:",
+		"- Cache/context replay dominates token volume.",
+		"- API call count is high for one session.",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+	if strings.Contains(out, "Recommendations") {
+		t.Fatalf("expected agent brief to omit regular recommendations section, got:\n%s", out)
+	}
+	if strings.Contains(out, "Likely contributors") {
+		t.Fatalf("expected agent brief to omit contributor detail, got:\n%s", out)
+	}
+}
+
+func TestTokensCmd_AgentBriefHighCacheReplayWithoutHighAPICalls(t *testing.T) {
+	setupStopTestRepo(t)
+
+	ctx := context.Background()
+	state := makeSessionState("test-tokens-brief-cache-only", session.PhaseActive)
+	state.AgentType = testAgentClaude
+	state.TokenUsage = &agent.TokenUsage{
+		InputTokens:     27_892,
+		CacheReadTokens: 608_896,
+		OutputTokens:    865,
+		APICallCount:    3,
+	}
+
+	if err := strategy.SaveSessionState(ctx, state); err != nil {
+		t.Fatalf("SaveSessionState() error = %v", err)
+	}
+
+	cmd := newTokensCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"test-tokens-brief-cache-only", "--agent-brief"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Token usage: 637.7k total; 95.5% cache/context replay; 3 API calls.",
+		"Summarize the current useful findings before continuing, and keep the next prompt narrow.",
+		"- Cache/context replay dominates token volume.",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+	if strings.Contains(out, "Continue normally") {
+		t.Fatalf("expected high cache replay to avoid continue-normally action, got:\n%s", out)
+	}
+}
+
+func TestTokensCmd_AgentBriefNoTokenData(t *testing.T) {
+	setupStopTestRepo(t)
+
+	ctx := context.Background()
+	state := makeSessionState("test-tokens-brief-missing", session.PhaseActive)
+	state.AgentType = testAgentGemini
+	state.ContextTokens = 9000
+	state.ContextWindowSize = 10000
+
+	if err := strategy.SaveSessionState(ctx, state); err != nil {
+		t.Fatalf("SaveSessionState() error = %v", err)
+	}
+
+	cmd := newTokensCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"test-tokens-brief-missing", "--agent-brief"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Session token brief",
+		"Session: test-tokens-brief-missing",
+		"Token usage: unavailable.",
+		"Next best action:",
+		"Token usage is not available yet.",
+		"Signals:",
+		"- Token usage is unavailable for this session.",
+		"- Context pressure is high.",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+}
+
 func TestSessionsCmd_TokensSubcommand(t *testing.T) {
 	setupStopTestRepo(t)
 
@@ -1197,6 +1330,39 @@ func TestSessionsCmd_TokensSubcommand(t *testing.T) {
 	}
 }
 
+func TestSessionsCmd_TokensSubcommandAgentBrief(t *testing.T) {
+	setupStopTestRepo(t)
+
+	ctx := context.Background()
+	state := makeSessionState("test-tokens-subcommand-brief", session.PhaseActive)
+	state.TokenUsage = &agent.TokenUsage{
+		InputTokens:  1200,
+		OutputTokens: 300,
+		APICallCount: 2,
+	}
+
+	if err := strategy.SaveSessionState(ctx, state); err != nil {
+		t.Fatalf("SaveSessionState() error = %v", err)
+	}
+
+	cmd := newSessionsCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"tokens", "test-tokens-subcommand-brief", "--agent-brief"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	if !strings.Contains(out, "Session token brief") {
+		t.Fatalf("expected agent brief output, got:\n%s", out)
+	}
+	if !strings.Contains(out, "Token usage: 1.5k total") {
+		t.Fatalf("expected token summary in brief, got:\n%s", out)
+	}
+}
+
 func TestSessionsCmd_HelpIncludesTokensSubcommand(t *testing.T) {
 	cmd := newSessionsCmd()
 	var stdout bytes.Buffer
@@ -1213,6 +1379,21 @@ func TestSessionsCmd_HelpIncludesTokensSubcommand(t *testing.T) {
 	}
 	if !strings.Contains(out, "entire session tokens <session-id>       Show token usage") {
 		t.Fatalf("expected tokens example in help, got:\n%s", out)
+	}
+}
+
+func TestTokensCmd_JSONAndAgentBriefAreMutuallyExclusive(t *testing.T) {
+	setupStopTestRepo(t)
+
+	cmd := newTokensCmd()
+	cmd.SetArgs([]string{"test-session", "--json", "--agent-brief"})
+
+	err := cmd.ExecuteContext(context.Background())
+	if err == nil {
+		t.Fatal("expected error for --json with --agent-brief")
+	}
+	if !strings.Contains(err.Error(), "mutually exclusive") {
+		t.Fatalf("expected mutually exclusive error, got: %v", err)
 	}
 }
 

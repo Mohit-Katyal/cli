@@ -69,6 +69,7 @@ type tokenRecommendationSignals struct {
 func newTokensCmd() *cobra.Command {
 	var jsonFlag bool
 	var currentFlag bool
+	var agentBriefFlag bool
 
 	cmd := &cobra.Command{
 		Use:   "tokens [session-id]",
@@ -78,9 +79,16 @@ func newTokensCmd() *cobra.Command {
 When no session ID is provided, Entire reports on the most recently active
 session, preferring the current worktree and falling back to the newest session
 if no state matches this worktree. The report uses token and context data Entire
-already captured for the session.`,
+already captured for the session.
+
+Use --agent-brief when an agent needs compact guidance for the next step, for
+example: "Use Entire token tracking to check how this session is doing and
+optimize next steps."`,
 		Args: cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			if jsonFlag && agentBriefFlag {
+				return errors.New("--json and --agent-brief are mutually exclusive")
+			}
 			if currentFlag && len(args) > 0 {
 				return errors.New("--current and session ID argument are mutually exclusive")
 			}
@@ -89,16 +97,17 @@ already captured for the session.`,
 			if len(args) > 0 {
 				sessionID = args[0]
 			}
-			return runSessionTokens(cmd.Context(), cmd, sessionID, currentFlag, jsonFlag)
+			return runSessionTokens(cmd.Context(), cmd, sessionID, currentFlag, jsonFlag, agentBriefFlag)
 		},
 	}
 
 	cmd.Flags().BoolVar(&jsonFlag, "json", false, "Output as JSON")
 	cmd.Flags().BoolVar(&currentFlag, "current", false, "Prefer the current worktree's most recent session")
+	cmd.Flags().BoolVar(&agentBriefFlag, "agent-brief", false, "Output compact next-step guidance for agents")
 	return cmd
 }
 
-func runSessionTokens(ctx context.Context, cmd *cobra.Command, sessionID string, current, jsonOutput bool) error {
+func runSessionTokens(ctx context.Context, cmd *cobra.Command, sessionID string, current, jsonOutput, agentBrief bool) error {
 	if sessionID == "" || current {
 		sessionID = strategy.FindMostRecentSession(ctx)
 		if sessionID == "" {
@@ -120,6 +129,10 @@ func runSessionTokens(ctx context.Context, cmd *cobra.Command, sessionID string,
 	report := buildSessionTokensReport(state, sessionPhaseLabel(state))
 	if jsonOutput {
 		return writeSessionTokensJSON(cmd.OutOrStdout(), report)
+	}
+	if agentBrief {
+		writeSessionTokensAgentBrief(cmd.OutOrStdout(), report)
+		return nil
 	}
 	writeSessionTokensText(cmd.OutOrStdout(), report)
 	return nil
@@ -385,6 +398,101 @@ func writeSessionTokensText(w io.Writer, report sessionTokensReport) {
 
 	writeTokenContributors(w, report.Contributors, report.Context)
 	writeTokenLimitations(w, report.Limitations)
+}
+
+func writeSessionTokensAgentBrief(w io.Writer, report sessionTokensReport) {
+	fmt.Fprintln(w, "Session token brief")
+	fmt.Fprintf(w, "Session: %s\n", report.SessionID)
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, agentBriefUsageLine(report.Tokens))
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, "Next best action:")
+	fmt.Fprintln(w, agentBriefNextAction(report))
+
+	signals := agentBriefSignals(report)
+	if len(signals) > 0 {
+		fmt.Fprintln(w)
+		fmt.Fprintln(w, "Signals:")
+		for _, signal := range signals {
+			fmt.Fprintf(w, "- %s\n", signal)
+		}
+	}
+}
+
+func agentBriefUsageLine(tokens *sessionTokensUsage) string {
+	if tokens == nil {
+		return "Token usage: unavailable."
+	}
+	if tokens.CacheRead > 0 {
+		return fmt.Sprintf(
+			"Token usage: %s total; %s cache/context replay; %s.",
+			formatTokenCount(tokens.Total),
+			formatPercent(tokenPercent(tokens.CacheRead, tokens.Total)),
+			formatAPICalls(tokens.APICalls),
+		)
+	}
+	return fmt.Sprintf("Token usage: %s total; %s.", formatTokenCount(tokens.Total), formatAPICalls(tokens.APICalls))
+}
+
+func formatAPICalls(count int) string {
+	if count == 1 {
+		return "1 API call"
+	}
+	return fmt.Sprintf("%d API calls", count)
+}
+
+func agentBriefNextAction(report sessionTokensReport) string {
+	switch {
+	case hasTokenRecommendation(report, "context-replay-hotspot") && hasTokenRecommendation(report, "api-call-amplification"):
+		return "Summarize the useful findings, then batch the next diagnostic step. Avoid more exploratory reads until you have a narrowed hypothesis."
+	case hasTokenRecommendation(report, "context-replay-hotspot"):
+		return "Summarize the current useful findings before continuing, and keep the next prompt narrow."
+	case hasTokenRecommendation(report, "no-token-data"):
+		return "Token usage is not available yet. Use this as a context check, not a spend diagnosis; continue after the next checkpoint captures usage."
+	case hasTokenRecommendation(report, "subagent-heavy"):
+		return "Keep the next agent or subagent task narrow with a concrete expected output; avoid broad parallel exploration."
+	case hasTokenRecommendation(report, "high-context-pressure"):
+		return "Preserve the useful findings and compact or restart before adding more broad context."
+	case hasTokenRecommendation(report, "long-session"):
+		return "Compact or restart after summarizing useful findings if older context is no longer needed."
+	default:
+		return "Continue normally; no high-signal token optimization is available from this session yet."
+	}
+}
+
+func agentBriefSignals(report sessionTokensReport) []string {
+	var signals []string
+	if hasTokenRecommendation(report, "context-replay-hotspot") {
+		signals = append(signals, "Cache/context replay dominates token volume.")
+	}
+	if hasTokenRecommendation(report, "api-call-amplification") {
+		signals = append(signals, "API call count is high for one session.")
+	}
+	if hasTokenRecommendation(report, "subagent-heavy") {
+		signals = append(signals, "Subagent usage is a meaningful part of total tokens.")
+	}
+	if hasTokenRecommendation(report, "high-context-pressure") {
+		signals = append(signals, "Context pressure is high.")
+	}
+	if hasTokenRecommendation(report, "long-session") {
+		signals = append(signals, "Session has crossed a long-session or checkpoint boundary.")
+	}
+	if hasTokenRecommendation(report, "no-token-data") {
+		signals = append([]string{"Token usage is unavailable for this session."}, signals...)
+	}
+	if len(signals) == 0 && report.Tokens != nil {
+		signals = append(signals, "No high-signal token risk detected from captured usage.")
+	}
+	return signals
+}
+
+func hasTokenRecommendation(report sessionTokensReport, id string) bool {
+	for _, rec := range report.Recommendations {
+		if rec.ID == id {
+			return true
+		}
+	}
+	return false
 }
 
 func writeTokenRecommendations(w io.Writer, recs []sessionTokensRecommendation) {

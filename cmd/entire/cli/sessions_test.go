@@ -1760,6 +1760,393 @@ func TestCheckpointTokensReport_UsesRootSummaryWhenSessionMetadataIncomplete(t *
 	}
 }
 
+func TestCheckpointTokensCmd_TextOutputWithComparison(t *testing.T) {
+	repo, _ := runExplainAutoTestRepo(t)
+	ctx := context.Background()
+	store := checkpoint.NewGitStore(repo)
+	baselineID := id.MustCheckpointID("aaa111bbb222")
+	currentID := id.MustCheckpointID("bbb222ccc333")
+
+	if err := store.WriteCommitted(ctx, checkpoint.WriteCommittedOptions{
+		CheckpointID: baselineID,
+		SessionID:    "checkpoint-token-baseline",
+		Strategy:     strategy.StrategyNameManualCommit,
+		Branch:       "tokens-compare",
+		Agent:        testAgentClaude,
+		Transcript:   redact.AlreadyRedacted([]byte(`{"type":"user","message":{"content":[{"type":"text","text":"baseline"}]}}` + "\n")),
+		AuthorName:   "Test",
+		AuthorEmail:  "test@example.com",
+		TokenUsage: &agent.TokenUsage{
+			InputTokens:         200_000,
+			CacheCreationTokens: 50_000,
+			CacheReadTokens:     750_000,
+			APICallCount:        10,
+		},
+	}); err != nil {
+		t.Fatalf("WriteCommitted() baseline error = %v", err)
+	}
+	if err := store.WriteCommitted(ctx, checkpoint.WriteCommittedOptions{
+		CheckpointID: currentID,
+		SessionID:    "checkpoint-token-current",
+		Strategy:     strategy.StrategyNameManualCommit,
+		Branch:       "tokens-compare",
+		Agent:        testAgentClaude,
+		Transcript:   redact.AlreadyRedacted([]byte(`{"type":"user","message":{"content":[{"type":"text","text":"current"}]}}` + "\n")),
+		AuthorName:   "Test",
+		AuthorEmail:  "test@example.com",
+		TokenUsage: &agent.TokenUsage{
+			InputTokens:         150_000,
+			CacheCreationTokens: 50_000,
+			CacheReadTokens:     300_000,
+			APICallCount:        4,
+		},
+	}); err != nil {
+		t.Fatalf("WriteCommitted() current error = %v", err)
+	}
+
+	cmd := newCheckpointGroupCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"tokens", "bbb222", "--compare", "aaa111"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Checkpoint tokens",
+		"Checkpoint: bbb222ccc333",
+		"Token usage",
+		"Total:  500k tokens",
+		"Comparison",
+		"Baseline: aaa111bbb222",
+		"Total tokens: down 50% (1000k -> 500k)",
+		"Cache/context replay: down 60% (750k -> 300k)",
+		"API calls: down 60% (10 -> 4)",
+		"Qualification",
+		"Observed token use decreased for this checkpoint comparison.",
+		"This does not prove quality was preserved",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+}
+
+func TestCheckpointTokensCmd_JSONOutputWithComparison(t *testing.T) {
+	repo, _ := runExplainAutoTestRepo(t)
+	ctx := context.Background()
+	store := checkpoint.NewGitStore(repo)
+	baselineID := id.MustCheckpointID("abc111abc111")
+	currentID := id.MustCheckpointID("abc222abc222")
+
+	if err := store.WriteCommitted(ctx, checkpoint.WriteCommittedOptions{
+		CheckpointID: baselineID,
+		SessionID:    "checkpoint-token-json-baseline",
+		Strategy:     strategy.StrategyNameManualCommit,
+		Agent:        testAgentGemini,
+		Transcript:   redact.AlreadyRedacted([]byte(`{"type":"user","message":{"content":[{"type":"text","text":"baseline json"}]}}` + "\n")),
+		AuthorName:   "Test",
+		AuthorEmail:  "test@example.com",
+		TokenUsage: &agent.TokenUsage{
+			InputTokens:     100,
+			CacheReadTokens: 300,
+			OutputTokens:    100,
+			APICallCount:    5,
+		},
+	}); err != nil {
+		t.Fatalf("WriteCommitted() baseline error = %v", err)
+	}
+	if err := store.WriteCommitted(ctx, checkpoint.WriteCommittedOptions{
+		CheckpointID: currentID,
+		SessionID:    "checkpoint-token-json-current",
+		Strategy:     strategy.StrategyNameManualCommit,
+		Agent:        testAgentGemini,
+		Transcript:   redact.AlreadyRedacted([]byte(`{"type":"user","message":{"content":[{"type":"text","text":"current json"}]}}` + "\n")),
+		AuthorName:   "Test",
+		AuthorEmail:  "test@example.com",
+		TokenUsage: &agent.TokenUsage{
+			InputTokens:     120,
+			CacheReadTokens: 480,
+			OutputTokens:    200,
+			APICallCount:    8,
+		},
+	}); err != nil {
+		t.Fatalf("WriteCommitted() current error = %v", err)
+	}
+
+	cmd := newCheckpointGroupCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"tokens", "abc222", "--compare", "abc111", "--json"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	var result checkpointTokensReport
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("expected valid JSON, got parse error: %v\noutput: %s", err, stdout.String())
+	}
+	if result.Comparison == nil {
+		t.Fatalf("expected comparison, got nil")
+	}
+	if result.Comparison.Status != "observed_increase" {
+		t.Fatalf("expected observed_increase status, got %q", result.Comparison.Status)
+	}
+	if result.Comparison.BaselineCheckpointID != "abc111abc111" {
+		t.Errorf("baseline checkpoint id = %q, want abc111abc111", result.Comparison.BaselineCheckpointID)
+	}
+	if result.Comparison.TargetCheckpointID != "abc222abc222" {
+		t.Errorf("target checkpoint id = %q, want abc222abc222", result.Comparison.TargetCheckpointID)
+	}
+	if result.Comparison.Total == nil {
+		t.Fatalf("expected total delta, got nil")
+	}
+	if result.Comparison.Total.Baseline != 500 || result.Comparison.Total.Current != 800 {
+		t.Fatalf("unexpected total delta: %+v", result.Comparison.Total)
+	}
+	if result.Comparison.Total.Change != 300 {
+		t.Fatalf("expected total change 300, got %+v", result.Comparison.Total)
+	}
+	if result.Comparison.Total.Direction != "up" {
+		t.Fatalf("expected total direction up, got %+v", result.Comparison.Total)
+	}
+	if result.Comparison.Total.ChangePercent == nil || *result.Comparison.Total.ChangePercent != 60 {
+		t.Fatalf("expected total change percent 60, got %+v", result.Comparison.Total)
+	}
+}
+
+func TestCheckpointTokensCmd_ComparisonNoChange(t *testing.T) {
+	repo, _ := runExplainAutoTestRepo(t)
+	ctx := context.Background()
+	store := checkpoint.NewGitStore(repo)
+	baselineID := id.MustCheckpointID("111aaa222bbb")
+	currentID := id.MustCheckpointID("222bbb333ccc")
+
+	writeCommittedTokenCheckpoint(ctx, t, store, baselineID, "checkpoint-token-no-change-baseline", &agent.TokenUsage{
+		InputTokens:  100,
+		OutputTokens: 100,
+		APICallCount: 2,
+	})
+	writeCommittedTokenCheckpoint(ctx, t, store, currentID, "checkpoint-token-no-change-current", &agent.TokenUsage{
+		InputTokens:  100,
+		OutputTokens: 100,
+		APICallCount: 2,
+	})
+
+	cmd := newCheckpointGroupCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"tokens", "222bbb", "--compare", "111aaa"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Total tokens: unchanged (200 -> 200)",
+		"Cache/context replay: unchanged (0 -> 0)",
+		"API calls: unchanged (2 -> 2)",
+		"Observed token use was unchanged for this checkpoint comparison.",
+		"Quality still depends on the task outcome",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+}
+
+func TestCheckpointTokensCmd_ComparisonUnavailableWhenBaselineTokenDataMissing(t *testing.T) {
+	repo, _ := runExplainAutoTestRepo(t)
+	ctx := context.Background()
+	store := checkpoint.NewGitStore(repo)
+	baselineID := id.MustCheckpointID("333ccc444ddd")
+	currentID := id.MustCheckpointID("444ddd555eee")
+
+	writeCommittedTokenCheckpoint(ctx, t, store, baselineID, "checkpoint-token-missing-baseline", nil)
+	writeCommittedTokenCheckpoint(ctx, t, store, currentID, "checkpoint-token-current-with-data", &agent.TokenUsage{
+		InputTokens:  100,
+		OutputTokens: 50,
+		APICallCount: 1,
+	})
+
+	cmd := newCheckpointGroupCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"tokens", "444ddd", "--compare", "333ccc"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Comparison",
+		"Baseline: 333ccc444ddd",
+		"Qualification",
+		"Comparison unavailable because token usage is missing for one checkpoint.",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+	if strings.Contains(out, "Total tokens:") {
+		t.Fatalf("expected unavailable comparison to omit metric deltas, got:\n%s", out)
+	}
+}
+
+func TestCheckpointTokensCmd_JSONComparisonUnavailableWhenCurrentTokenDataMissing(t *testing.T) {
+	repo, _ := runExplainAutoTestRepo(t)
+	ctx := context.Background()
+	store := checkpoint.NewGitStore(repo)
+	baselineID := id.MustCheckpointID("555eee666fff")
+	currentID := id.MustCheckpointID("666fff777aaa")
+
+	writeCommittedTokenCheckpoint(ctx, t, store, baselineID, "checkpoint-token-baseline-with-data", &agent.TokenUsage{
+		InputTokens:  100,
+		OutputTokens: 50,
+		APICallCount: 1,
+	})
+	writeCommittedTokenCheckpoint(ctx, t, store, currentID, "checkpoint-token-missing-current", nil)
+
+	cmd := newCheckpointGroupCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"tokens", "666fff", "--compare", "555eee", "--json"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	var result checkpointTokensReport
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("expected valid JSON, got parse error: %v\noutput: %s", err, stdout.String())
+	}
+	if result.Comparison == nil {
+		t.Fatalf("expected comparison, got nil")
+	}
+	if result.Comparison.Status != "unavailable" {
+		t.Fatalf("expected unavailable status, got %q", result.Comparison.Status)
+	}
+	if result.Comparison.Total != nil {
+		t.Fatalf("expected no total delta when current token data is missing, got %+v", result.Comparison.Total)
+	}
+	if len(result.Comparison.Limitations) == 0 {
+		t.Fatalf("expected comparison limitation, got %+v", result.Comparison)
+	}
+}
+
+func TestCheckpointTokensCmd_ComparisonUsesMultiSessionAggregates(t *testing.T) {
+	repo, _ := runExplainAutoTestRepo(t)
+	ctx := context.Background()
+	store := checkpoint.NewGitStore(repo)
+	baselineID := id.MustCheckpointID("777aaa888bbb")
+	currentID := id.MustCheckpointID("888bbb999ccc")
+
+	writeCommittedTokenCheckpoint(ctx, t, store, baselineID, "checkpoint-token-baseline-one", &agent.TokenUsage{
+		InputTokens:  1_000,
+		APICallCount: 1,
+	})
+	writeCommittedTokenCheckpoint(ctx, t, store, baselineID, "checkpoint-token-baseline-two", &agent.TokenUsage{
+		OutputTokens: 1_000,
+		APICallCount: 1,
+	})
+	writeCommittedTokenCheckpoint(ctx, t, store, currentID, "checkpoint-token-current-one", &agent.TokenUsage{
+		InputTokens:  500,
+		APICallCount: 1,
+	})
+	writeCommittedTokenCheckpoint(ctx, t, store, currentID, "checkpoint-token-current-two", &agent.TokenUsage{
+		OutputTokens: 500,
+		APICallCount: 1,
+	})
+
+	cmd := newCheckpointGroupCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"tokens", "888bbb", "--compare", "777aaa"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Sessions:   2",
+		"Total:  1k tokens",
+		"Baseline: 777aaa888bbb",
+		"Total tokens: down 50% (2k -> 1k)",
+		"API calls: unchanged (2 -> 2)",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+}
+
+func TestCheckpointTokensCmd_ComparisonOmitsPercentWhenBaselineMetricIsZero(t *testing.T) {
+	repo, _ := runExplainAutoTestRepo(t)
+	ctx := context.Background()
+	store := checkpoint.NewGitStore(repo)
+	baselineID := id.MustCheckpointID("999ccc000aaa")
+	currentID := id.MustCheckpointID("000aaa111bbb")
+
+	writeCommittedTokenCheckpoint(ctx, t, store, baselineID, "checkpoint-token-zero-api-baseline", &agent.TokenUsage{
+		InputTokens: 100,
+	})
+	writeCommittedTokenCheckpoint(ctx, t, store, currentID, "checkpoint-token-zero-api-current", &agent.TokenUsage{
+		InputTokens:  100,
+		APICallCount: 3,
+	})
+
+	cmd := newCheckpointGroupCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"tokens", "000aaa", "--compare", "999ccc"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Total tokens: unchanged (100 -> 100)",
+		"API calls: up (0 -> 3)",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+	if strings.Contains(out, "API calls: up ") && strings.Contains(out, "API calls: up %") {
+		t.Fatalf("expected zero-baseline API delta to omit percent, got:\n%s", out)
+	}
+}
+
+func writeCommittedTokenCheckpoint(ctx context.Context, t *testing.T, store *checkpoint.GitStore, cpID id.CheckpointID, sessionID string, usage *agent.TokenUsage) {
+	t.Helper()
+
+	if err := store.WriteCommitted(ctx, checkpoint.WriteCommittedOptions{
+		CheckpointID: cpID,
+		SessionID:    sessionID,
+		Strategy:     strategy.StrategyNameManualCommit,
+		Branch:       "tokens-compare",
+		Agent:        testAgentClaude,
+		Transcript:   redact.AlreadyRedacted([]byte(`{"type":"user","message":{"content":[{"type":"text","text":"compare"}]}}` + "\n")),
+		AuthorName:   "Test",
+		AuthorEmail:  "test@example.com",
+		TokenUsage:   usage,
+	}); err != nil {
+		t.Fatalf("WriteCommitted(%s) error = %v", cpID, err)
+	}
+}
+
 func TestInfoCmd_EndedSession(t *testing.T) {
 	setupStopTestRepo(t)
 

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/entireio/cli/cmd/entire/cli/agent"
@@ -27,11 +28,39 @@ type checkpointTokensReport struct {
 	Context         *sessionTokensContext         `json:"context,omitempty"`
 	Contributors    []sessionTokensContributor    `json:"contributors,omitempty"`
 	Recommendations []sessionTokensRecommendation `json:"recommendations,omitempty"`
+	Comparison      *checkpointTokensComparison   `json:"comparison,omitempty"`
 	Limitations     []string                      `json:"limitations,omitempty"`
 }
 
+type checkpointTokensComparison struct {
+	BaselineCheckpointID string                       `json:"baseline_checkpoint_id"`
+	TargetCheckpointID   string                       `json:"target_checkpoint_id"`
+	Status               string                       `json:"status"`
+	Total                *checkpointTokensMetricDelta `json:"total,omitempty"`
+	CacheRead            *checkpointTokensMetricDelta `json:"cache_read,omitempty"`
+	APICalls             *checkpointTokensMetricDelta `json:"api_calls,omitempty"`
+	Qualification        string                       `json:"qualification"`
+	Limitations          []string                     `json:"limitations,omitempty"`
+}
+
+type checkpointTokensMetricDelta struct {
+	Baseline      int      `json:"baseline"`
+	Current       int      `json:"current"`
+	Change        int      `json:"change"`
+	ChangePercent *float64 `json:"change_percent,omitempty"`
+	Direction     string   `json:"direction"`
+}
+
+const (
+	checkpointComparisonStatusUnavailable       = "unavailable"
+	checkpointComparisonStatusObservedReduction = "observed_reduction"
+	checkpointComparisonStatusObservedIncrease  = "observed_increase"
+	checkpointComparisonStatusObservedNoChange  = "observed_no_change"
+)
+
 func newCheckpointTokensCmd() *cobra.Command {
 	var jsonFlag bool
+	var compareFlag string
 
 	cmd := &cobra.Command{
 		Use:   "tokens <checkpoint-id>",
@@ -42,19 +71,23 @@ The report reads committed checkpoint metadata using the same checkpoint
 resolution path as 'entire checkpoint explain'. Checkpoint IDs may be abbreviated
 as long as the prefix is unambiguous; positional targets may also resolve from a
 commit ref with an Entire-Checkpoint trailer, and missing metadata may be fetched
-from the checkpoint remote.`,
+from the checkpoint remote.
+
+Use --compare <checkpoint-id> to compare this checkpoint against a previous
+checkpoint and qualify observed token reduction or increase.`,
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return runCheckpointTokens(cmd.Context(), cmd, args[0], jsonFlag)
+			return runCheckpointTokens(cmd.Context(), cmd, args[0], jsonFlag, compareFlag)
 		},
 	}
 
 	cmd.Flags().BoolVar(&jsonFlag, "json", false, "Output as JSON")
+	cmd.Flags().StringVar(&compareFlag, "compare", "", "Compare against a baseline checkpoint ID")
 	return cmd
 }
 
-func runCheckpointTokens(ctx context.Context, cmd *cobra.Command, checkpointIDPrefix string, jsonOutput bool) error {
-	cpID, lookup, err := resolveExplainCheckpointID(ctx, cmd.ErrOrStderr(), explainExportOptions{target: checkpointIDPrefix})
+func runCheckpointTokens(ctx context.Context, cmd *cobra.Command, checkpointIDPrefix string, jsonOutput bool, comparePrefix string) error {
+	report, lookup, err := loadCheckpointTokensReport(ctx, cmd, checkpointIDPrefix)
 	if lookup != nil {
 		defer lookup.Close()
 	}
@@ -62,27 +95,46 @@ func runCheckpointTokens(ctx context.Context, cmd *cobra.Command, checkpointIDPr
 		return tokenCommandError(err)
 	}
 
-	summary, err := lookup.store.ReadCommitted(ctx, cpID)
-	if err != nil {
-		return tokenCommandError(fmt.Errorf("failed to read checkpoint: %w", err))
-	}
-	if summary == nil || len(summary.Sessions) == 0 {
-		cmd.SilenceUsage = true
-		fmt.Fprintln(cmd.ErrOrStderr(), "Checkpoint not found.")
-		return NewSilentError(fmt.Errorf("%w: %s", checkpoint.ErrCheckpointNotFound, checkpointIDPrefix))
-	}
-
-	metas, metadataWarnings, err := readCheckpointTokenSessionMetadata(ctx, lookup.store, cpID, len(summary.Sessions))
-	if err != nil {
-		return tokenCommandError(err)
+	if comparePrefix != "" {
+		baselineReport, baselineLookup, err := loadCheckpointTokensReport(ctx, cmd, comparePrefix)
+		if baselineLookup != nil {
+			defer baselineLookup.Close()
+		}
+		if err != nil {
+			return tokenCommandError(err)
+		}
+		report.Comparison = buildCheckpointTokensComparison(report, baselineReport)
 	}
 
-	report := buildCheckpointTokensReport(cpID, summary, metas, metadataWarnings)
 	if jsonOutput {
 		return writeCheckpointTokensJSON(cmd.OutOrStdout(), report)
 	}
 	writeCheckpointTokensText(cmd.OutOrStdout(), report)
 	return nil
+}
+
+func loadCheckpointTokensReport(ctx context.Context, cmd *cobra.Command, checkpointIDPrefix string) (checkpointTokensReport, *explainCheckpointLookup, error) {
+	cpID, lookup, err := resolveExplainCheckpointID(ctx, cmd.ErrOrStderr(), explainExportOptions{target: checkpointIDPrefix})
+	if err != nil {
+		return checkpointTokensReport{}, lookup, err
+	}
+
+	summary, err := lookup.store.ReadCommitted(ctx, cpID)
+	if err != nil {
+		return checkpointTokensReport{}, lookup, fmt.Errorf("failed to read checkpoint: %w", err)
+	}
+	if summary == nil || len(summary.Sessions) == 0 {
+		cmd.SilenceUsage = true
+		fmt.Fprintln(cmd.ErrOrStderr(), "Checkpoint not found.")
+		return checkpointTokensReport{}, lookup, NewSilentError(fmt.Errorf("%w: %s", checkpoint.ErrCheckpointNotFound, checkpointIDPrefix))
+	}
+
+	metas, metadataWarnings, err := readCheckpointTokenSessionMetadata(ctx, lookup.store, cpID, len(summary.Sessions))
+	if err != nil {
+		return checkpointTokensReport{}, lookup, err
+	}
+
+	return buildCheckpointTokensReport(cpID, summary, metas, metadataWarnings), lookup, nil
 }
 
 func readCheckpointTokenSessionMetadata(ctx context.Context, store *checkpoint.GitStore, cpID id.CheckpointID, sessionCount int) ([]*checkpoint.CommittedMetadata, int, error) {
@@ -308,6 +360,78 @@ func tokenPluralSuffix(count int) string {
 	return "s"
 }
 
+func buildCheckpointTokensComparison(target, baseline checkpointTokensReport) *checkpointTokensComparison {
+	comparison := &checkpointTokensComparison{
+		BaselineCheckpointID: baseline.CheckpointID,
+		TargetCheckpointID:   target.CheckpointID,
+	}
+	if target.Tokens == nil || baseline.Tokens == nil {
+		comparison.Status = checkpointComparisonStatusUnavailable
+		comparison.Qualification = "Comparison unavailable because token usage is missing for one checkpoint."
+		comparison.Limitations = append(comparison.Limitations, comparison.Qualification)
+		return comparison
+	}
+
+	comparison.Total = buildCheckpointMetricDelta(baseline.Tokens.Total, target.Tokens.Total)
+	comparison.CacheRead = buildCheckpointMetricDelta(baseline.Tokens.CacheRead, target.Tokens.CacheRead)
+	comparison.APICalls = buildCheckpointMetricDelta(baseline.Tokens.APICalls, target.Tokens.APICalls)
+	comparison.Status = checkpointComparisonStatus(comparison.Total)
+	comparison.Qualification = checkpointComparisonQualification(comparison.Status)
+	return comparison
+}
+
+func buildCheckpointMetricDelta(baseline, current int) *checkpointTokensMetricDelta {
+	delta := &checkpointTokensMetricDelta{
+		Baseline:  baseline,
+		Current:   current,
+		Change:    current - baseline,
+		Direction: checkpointDeltaDirection(current - baseline),
+	}
+	if baseline != 0 {
+		percent := float64(delta.Change) * 100 / float64(baseline)
+		delta.ChangePercent = &percent
+	}
+	return delta
+}
+
+func checkpointDeltaDirection(change int) string {
+	switch {
+	case change < 0:
+		return "down"
+	case change > 0:
+		return "up"
+	default:
+		return "unchanged"
+	}
+}
+
+func checkpointComparisonStatus(total *checkpointTokensMetricDelta) string {
+	if total == nil {
+		return checkpointComparisonStatusUnavailable
+	}
+	switch total.Direction {
+	case "down":
+		return checkpointComparisonStatusObservedReduction
+	case "up":
+		return checkpointComparisonStatusObservedIncrease
+	default:
+		return checkpointComparisonStatusObservedNoChange
+	}
+}
+
+func checkpointComparisonQualification(status string) string {
+	switch status {
+	case checkpointComparisonStatusObservedReduction:
+		return "Observed token use decreased for this checkpoint comparison. This does not prove quality was preserved; verify the task outcome or tests before treating it as a successful optimization."
+	case checkpointComparisonStatusObservedIncrease:
+		return "Observed token use increased for this checkpoint comparison. Check whether the extra context was necessary before treating it as waste."
+	case checkpointComparisonStatusObservedNoChange:
+		return "Observed token use was unchanged for this checkpoint comparison. Quality still depends on the task outcome, not token totals alone."
+	default:
+		return "Comparison unavailable because token usage is missing for one checkpoint."
+	}
+}
+
 func writeCheckpointTokensJSON(w io.Writer, report checkpointTokensReport) error {
 	enc := json.NewEncoder(w)
 	enc.SetIndent("", "  ")
@@ -346,9 +470,54 @@ func writeCheckpointTokensText(w io.Writer, report checkpointTokensReport) {
 	}
 
 	writeTokenUsageSection(w, report.Tokens)
+	writeCheckpointTokenComparison(w, report.Comparison)
 	if len(report.Recommendations) > 0 {
 		writeTokenRecommendations(w, report.Recommendations)
 	}
 	writeTokenContributors(w, report.Contributors, report.Context)
 	writeTokenLimitations(w, report.Limitations)
+}
+
+func writeCheckpointTokenComparison(w io.Writer, comparison *checkpointTokensComparison) {
+	if comparison == nil {
+		return
+	}
+
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, "Comparison")
+	fmt.Fprintf(w, "Baseline: %s\n", comparison.BaselineCheckpointID)
+	if comparison.Status != checkpointComparisonStatusUnavailable {
+		fmt.Fprintf(w, "Total tokens: %s\n", formatCheckpointMetricDelta(comparison.Total, formatTokenCount))
+		fmt.Fprintf(w, "Cache/context replay: %s\n", formatCheckpointMetricDelta(comparison.CacheRead, formatTokenCount))
+		fmt.Fprintf(w, "API calls: %s\n", formatCheckpointMetricDelta(comparison.APICalls, formatPlainCount))
+	}
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, "Qualification")
+	fmt.Fprintln(w, comparison.Qualification)
+}
+
+func formatCheckpointMetricDelta(delta *checkpointTokensMetricDelta, formatValue func(int) string) string {
+	if delta == nil {
+		return "unavailable"
+	}
+	from := formatValue(delta.Baseline)
+	to := formatValue(delta.Current)
+	if delta.Direction == "unchanged" {
+		return fmt.Sprintf("unchanged (%s -> %s)", from, to)
+	}
+	if delta.ChangePercent == nil {
+		return fmt.Sprintf("%s (%s -> %s)", delta.Direction, from, to)
+	}
+	return fmt.Sprintf("%s %s (%s -> %s)", delta.Direction, formatPercent(absFloat(*delta.ChangePercent)), from, to)
+}
+
+func formatPlainCount(value int) string {
+	return strconv.Itoa(value)
+}
+
+func absFloat(value float64) float64 {
+	if value < 0 {
+		return -value
+	}
+	return value
 }

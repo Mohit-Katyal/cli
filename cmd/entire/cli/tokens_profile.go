@@ -96,6 +96,7 @@ checkpoints; use --limit or --all to change the scope.`,
 	cmd.Flags().BoolVar(&jsonFlag, "json", false, "Output as JSON")
 	cmd.Flags().IntVar(&limitFlag, "limit", 50, "Maximum committed checkpoints to analyze")
 	cmd.Flags().BoolVar(&allFlag, "all", false, "Analyze all committed checkpoints")
+	cmd.MarkFlagsMutuallyExclusive("limit", "all")
 	return cmd
 }
 
@@ -109,6 +110,7 @@ func runTokensProfile(ctx context.Context, cmd *cobra.Command, jsonOutput bool, 
 	defer repo.Close()
 
 	store := checkpoint.NewCommittedReadStore(ctx, repo)
+	store.SetBlobFetcher(FetchBlobsByHash)
 	infos, err := store.ListCommitted(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to list checkpoints: %w", err)

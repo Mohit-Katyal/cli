@@ -177,6 +177,21 @@ func TestTokensProfileCmd_LimitScopesAnalyzedCheckpoints(t *testing.T) {
 	}
 }
 
+func TestTokensProfileCmd_LimitAndAllAreMutuallyExclusive(t *testing.T) {
+	runExplainAutoTestRepo(t)
+
+	cmd := newTokensGroupCmd()
+	cmd.SetArgs([]string{"profile", "--limit", "2", "--all"})
+
+	err := cmd.ExecuteContext(context.Background())
+	if err == nil {
+		t.Fatal("expected error for --limit with --all")
+	}
+	if !strings.Contains(err.Error(), "limit") || !strings.Contains(err.Error(), "all") {
+		t.Fatalf("expected error to mention limit and all, got: %v", err)
+	}
+}
+
 func TestTokensProfileCmd_EmptyHistory(t *testing.T) {
 	runExplainAutoTestRepo(t)
 

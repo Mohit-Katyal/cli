@@ -1258,6 +1258,47 @@ func TestTokensCmd_AgentBriefHighCacheReplayWithoutHighAPICalls(t *testing.T) {
 	}
 }
 
+func TestTokensCmd_AgentBriefHighAPICallsWithoutCacheReplay(t *testing.T) {
+	setupStopTestRepo(t)
+
+	ctx := context.Background()
+	state := makeSessionState("test-tokens-brief-api-only", session.PhaseActive)
+	state.AgentType = testAgentClaude
+	state.TokenUsage = &agent.TokenUsage{
+		InputTokens:  10_000,
+		OutputTokens: 1_000,
+		APICallCount: 25,
+	}
+
+	if err := strategy.SaveSessionState(ctx, state); err != nil {
+		t.Fatalf("SaveSessionState() error = %v", err)
+	}
+
+	cmd := newTokensCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"test-tokens-brief-api-only", "--agent-brief"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	out := stdout.String()
+	checks := []string{
+		"Token usage: 11k total; 25 API calls.",
+		"Batch the next diagnostic step around one narrowed hypothesis before making more tool calls.",
+		"- API call count is high for one session.",
+	}
+	for _, check := range checks {
+		if !strings.Contains(out, check) {
+			t.Errorf("expected %q in output, got:\n%s", check, out)
+		}
+	}
+	if strings.Contains(out, "Continue normally") {
+		t.Fatalf("expected high API calls to avoid continue-normally action, got:\n%s", out)
+	}
+}
+
 func TestTokensCmd_AgentBriefNoTokenData(t *testing.T) {
 	setupStopTestRepo(t)
 

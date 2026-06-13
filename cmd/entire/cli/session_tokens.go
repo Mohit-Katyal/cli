@@ -445,6 +445,8 @@ func agentBriefNextAction(report sessionTokensReport) string {
 	switch {
 	case hasTokenRecommendation(report, "context-replay-hotspot") && hasTokenRecommendation(report, "api-call-amplification"):
 		return "Summarize the useful findings, then batch the next diagnostic step. Avoid more exploratory reads until you have a narrowed hypothesis."
+	case hasTokenRecommendation(report, "api-call-amplification"):
+		return "Batch the next diagnostic step around one narrowed hypothesis before making more tool calls."
 	case hasTokenRecommendation(report, "context-replay-hotspot"):
 		return "Summarize the current useful findings before continuing, and keep the next prompt narrow."
 	case hasTokenRecommendation(report, "no-token-data"):

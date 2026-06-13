@@ -1804,7 +1804,7 @@ func TestCheckpointTokensReport_UsesRootSummaryWhenSessionMetadataIncomplete(t *
 func TestCheckpointTokensCmd_TextOutputWithComparison(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 	baselineID := id.MustCheckpointID("aaa111bbb222")
 	currentID := id.MustCheckpointID("bbb222ccc333")
 
@@ -1879,7 +1879,7 @@ func TestCheckpointTokensCmd_TextOutputWithComparison(t *testing.T) {
 func TestCheckpointTokensCmd_JSONOutputWithComparison(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 	baselineID := id.MustCheckpointID("abc111abc111")
 	currentID := id.MustCheckpointID("abc222abc222")
 
@@ -1963,7 +1963,7 @@ func TestCheckpointTokensCmd_JSONOutputWithComparison(t *testing.T) {
 func TestCheckpointTokensCmd_ComparisonNoChange(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 	baselineID := id.MustCheckpointID("111aaa222bbb")
 	currentID := id.MustCheckpointID("222bbb333ccc")
 
@@ -2005,7 +2005,7 @@ func TestCheckpointTokensCmd_ComparisonNoChange(t *testing.T) {
 func TestCheckpointTokensCmd_ComparisonUnavailableWhenBaselineTokenDataMissing(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 	baselineID := id.MustCheckpointID("333ccc444ddd")
 	currentID := id.MustCheckpointID("444ddd555eee")
 
@@ -2045,7 +2045,7 @@ func TestCheckpointTokensCmd_ComparisonUnavailableWhenBaselineTokenDataMissing(t
 func TestCheckpointTokensCmd_JSONComparisonUnavailableWhenCurrentTokenDataMissing(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 	baselineID := id.MustCheckpointID("555eee666fff")
 	currentID := id.MustCheckpointID("666fff777aaa")
 
@@ -2086,7 +2086,7 @@ func TestCheckpointTokensCmd_JSONComparisonUnavailableWhenCurrentTokenDataMissin
 func TestCheckpointTokensCmd_ComparisonUsesMultiSessionAggregates(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 	baselineID := id.MustCheckpointID("777aaa888bbb")
 	currentID := id.MustCheckpointID("888bbb999ccc")
 
@@ -2134,7 +2134,7 @@ func TestCheckpointTokensCmd_ComparisonUsesMultiSessionAggregates(t *testing.T) 
 func TestCheckpointTokensCmd_ComparisonOmitsPercentWhenBaselineMetricIsZero(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 	baselineID := id.MustCheckpointID("999ccc000aaa")
 	currentID := id.MustCheckpointID("000aaa111bbb")
 

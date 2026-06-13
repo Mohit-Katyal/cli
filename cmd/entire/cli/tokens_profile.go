@@ -109,7 +109,7 @@ func runTokensProfile(ctx context.Context, cmd *cobra.Command, jsonOutput bool, 
 	}
 	defer repo.Close()
 
-	store := checkpoint.NewCommittedReadStore(ctx, repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.ResolveCommittedRefs(ctx))
 	store.SetBlobFetcher(FetchBlobsByHash)
 	infos, err := store.ListCommitted(ctx)
 	if err != nil {

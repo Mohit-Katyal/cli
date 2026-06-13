@@ -17,7 +17,7 @@ import (
 func TestTokensProfileCmd_TextOutputAggregatesCommittedCheckpoints(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 
 	writeProfileTokenCheckpoint(ctx, t, store, "100aaa000001", "profile-cache-hotspot", &agent.TokenUsage{
 		InputTokens:         100,
@@ -87,7 +87,7 @@ func TestTokensProfileCmd_TextOutputAggregatesCommittedCheckpoints(t *testing.T)
 func TestTokensProfileCmd_JSONOutput(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 
 	writeProfileTokenCheckpoint(ctx, t, store, "200bbb000001", "profile-json-cache", &agent.TokenUsage{
 		InputTokens:     100,
@@ -133,10 +133,46 @@ func TestTokensProfileCmd_JSONOutput(t *testing.T) {
 	}
 }
 
+func TestTokensProfileCmd_JSONOutputReportsAPICallOnlyCheckpoints(t *testing.T) {
+	repo, _ := runExplainAutoTestRepo(t)
+	ctx := context.Background()
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
+
+	writeProfileTokenCheckpoint(ctx, t, store, "250bbb000001", "profile-json-api-only", &agent.TokenUsage{
+		APICallCount: 25,
+	})
+
+	cmd := newTokensGroupCmd()
+	var stdout bytes.Buffer
+	cmd.SetOut(&stdout)
+	cmd.SetArgs([]string{"profile", "--json"})
+
+	if err := cmd.ExecuteContext(ctx); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	var result tokensProfileReport
+	if err := json.Unmarshal(stdout.Bytes(), &result); err != nil {
+		t.Fatalf("expected valid JSON, got parse error: %v\noutput: %s", err, stdout.String())
+	}
+	if result.CheckpointsWithTokenData != 1 {
+		t.Fatalf("checkpoints_with_token_data = %d, want 1", result.CheckpointsWithTokenData)
+	}
+	if result.MissingTokenData != 0 {
+		t.Fatalf("missing_token_data = %d, want 0", result.MissingTokenData)
+	}
+	if result.Tokens == nil || result.Tokens.Total != 0 || result.Tokens.APICalls != 25 {
+		t.Fatalf("unexpected token usage: %+v", result.Tokens)
+	}
+	if got := signalCount(result.Signals, "api-call-amplification"); got != 1 {
+		t.Fatalf("api-call-amplification signal count = %d, want 1", got)
+	}
+}
+
 func TestTokensProfileCmd_LimitScopesAnalyzedCheckpoints(t *testing.T) {
 	repo, _ := runExplainAutoTestRepo(t)
 	ctx := context.Background()
-	store := checkpoint.NewGitStore(repo)
+	store := checkpoint.NewGitStore(repo, checkpoint.DefaultV1Refs())
 
 	writeProfileTokenCheckpoint(ctx, t, store, "300ccc000001", "profile-limit-one", &agent.TokenUsage{
 		InputTokens:  100,

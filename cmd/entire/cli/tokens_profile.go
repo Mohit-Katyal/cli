@@ -51,8 +51,9 @@ const tokensProfileUsageScopeCheckpointObserved = "checkpoint_observed"
 
 func newTokensGroupCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "tokens",
-		Short: "Analyze token usage across sessions and checkpoints",
+		Use:    "tokens",
+		Short:  "Analyze token usage across sessions and checkpoints",
+		Hidden: true,
 		Long: `Analyze token usage across sessions and checkpoints.
 
 Commands:

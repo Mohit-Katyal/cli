@@ -1254,6 +1254,7 @@ func TestTokensCmd_AgentBriefPrioritizesNextAction(t *testing.T) {
 		"Token usage: 6213.6k total; 97.4% cache/context replay; 70 API calls.",
 		"Next best action:",
 		"Use at most 3 batched reads before answering.",
+		"Continue only if a named file or test can change the verdict; otherwise answer now.",
 		"Avoid broad grep, broad diffs, broad tests, and repeated token diagnostics; keep the answer tight.",
 		"Signals:",
 		"- Cache/context replay dominates token volume.",
@@ -1303,7 +1304,7 @@ func TestTokensCmd_AgentBriefHighCacheReplayWithoutHighAPICalls(t *testing.T) {
 	out := stdout.String()
 	checks := []string{
 		"Token usage: 637.7k total; 95.5% cache/context replay; 3 API calls.",
-		"Use at most 2 focused reads after summarizing known findings, then answer.",
+		"Use at most 2 focused reads only if a named file or test can change the answer; otherwise answer now.",
 		"Avoid broad grep, broad diffs, and broad tests.",
 		"- Cache/context replay dominates token volume.",
 	}
@@ -1423,6 +1424,7 @@ func TestSessionTokensAgentBriefClassAwareCostProxy(t *testing.T) {
 		"Session: test-cost-proxy-brief",
 		"Use at most 3 batched reads",
 		"Avoid broad grep, broad diffs, broad tests",
+		"otherwise answer now",
 		"keep the answer tight",
 		"- Cache write/new context pressure is elevated.",
 		"- Output pressure is elevated.",
@@ -1458,6 +1460,7 @@ func TestCheckpointTokensAgentBriefClassAwareCostProxy(t *testing.T) {
 		"Checkpoint: c05e500cafe0",
 		"Use at most 3 batched reads",
 		"Avoid broad grep, broad diffs, broad tests",
+		"otherwise answer now",
 		"keep the answer tight",
 		"- Cache write/new context pressure is elevated.",
 		"- Output pressure is elevated.",
@@ -1860,6 +1863,7 @@ func TestCheckpointTokensCmd_AgentBriefGivesOperationalBudget(t *testing.T) {
 		"Token usage: 6213.6k total; 97.4% cache/context replay; 70 API calls.",
 		"Next best action:",
 		"Use at most 3 batched reads before answering.",
+		"Continue only if a named file or test can change the verdict; otherwise answer now.",
 		"Avoid broad grep, broad diffs, broad tests, and repeated token diagnostics; keep the answer tight.",
 		"Signals:",
 		"- Cache/context replay dominates token volume.",

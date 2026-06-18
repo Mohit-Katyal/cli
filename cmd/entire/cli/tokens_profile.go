@@ -356,10 +356,10 @@ func tokensProfileLimitations(report tokensProfileReport) []string {
 		limitations = append(limitations, "No committed checkpoints found.")
 	}
 	if report.MissingTokenData > 0 {
-		limitations = append(limitations, fmt.Sprintf("%d checkpoint%s did not include token usage.", report.MissingTokenData, pluralSuffix(report.MissingTokenData)))
+		limitations = append(limitations, fmt.Sprintf("%d checkpoint%s did not include token usage.", report.MissingTokenData, tokenPluralSuffix(report.MissingTokenData)))
 	}
 	if report.MetadataReadWarnings > 0 {
-		limitations = append(limitations, fmt.Sprintf("%d checkpoint%s had incomplete session metadata; profile used root token summaries or readable sessions where available.", report.MetadataReadWarnings, pluralSuffix(report.MetadataReadWarnings)))
+		limitations = append(limitations, fmt.Sprintf("%d checkpoint%s had incomplete session metadata; profile used root token summaries or readable sessions where available.", report.MetadataReadWarnings, tokenPluralSuffix(report.MetadataReadWarnings)))
 	}
 	if report.Tokens != nil {
 		limitations = append(limitations, "Token totals are summed from analyzed checkpoints and may include overlapping checkpoint history; treat them as checkpoint-observed volume, not guaranteed unique session spend.")
@@ -407,17 +407,10 @@ func writeTokensProfileSignals(w io.Writer, signals []tokensProfileSignal) {
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, "Repeated signals")
 	for _, signal := range signals {
-		fmt.Fprintf(w, "- %s: %d checkpoint%s", signal.Label, signal.Count, pluralSuffix(signal.Count))
+		fmt.Fprintf(w, "- %s: %d checkpoint%s", signal.Label, signal.Count, tokenPluralSuffix(signal.Count))
 		if signal.Percent > 0 {
 			fmt.Fprintf(w, " (%d%%)", signal.Percent)
 		}
 		fmt.Fprintln(w)
 	}
-}
-
-func pluralSuffix(count int) string {
-	if count == 1 {
-		return ""
-	}
-	return "s"
 }

@@ -43,6 +43,7 @@ func TestSessionAdopt_CopiesExternalSessionIntoCurrentWorktree(t *testing.T) {
 		LastPrompt:            "update target file",
 		FilesTouched:          []string{"source-only.txt"},
 		TurnCheckpointIDs:     []string{"abc123def456"},
+		AttachedManually:      true,
 	}); err != nil {
 		t.Fatal(err)
 	}
@@ -79,8 +80,8 @@ func TestSessionAdopt_CopiesExternalSessionIntoCurrentWorktree(t *testing.T) {
 	if adopted.TranscriptPath != transcriptPath {
 		t.Fatalf("TranscriptPath = %q, want %q", adopted.TranscriptPath, transcriptPath)
 	}
-	if !adopted.AttachedManually {
-		t.Fatal("expected adopted session to be marked manual")
+	if adopted.AttachedManually {
+		t.Fatal("adopted active sessions should not be marked manually attached")
 	}
 	if len(adopted.FilesTouched) != 1 || adopted.FilesTouched[0] != "feature.txt" {
 		t.Fatalf("FilesTouched = %v, want [feature.txt]", adopted.FilesTouched)
@@ -90,6 +91,9 @@ func TestSessionAdopt_CopiesExternalSessionIntoCurrentWorktree(t *testing.T) {
 	}
 	if !bytes.Contains(out.Bytes(), []byte("Adopted session")) {
 		t.Fatalf("output = %q, want adoption confirmation", out.String())
+	}
+	if !bytes.Contains(out.Bytes(), []byte("Review tracked files before committing")) {
+		t.Fatalf("output = %q, want tracked-file attribution warning", out.String())
 	}
 }
 

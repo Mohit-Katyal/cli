@@ -97,6 +97,7 @@ func runAdopt(ctx context.Context, w io.Writer, sessionID string, opts adoptOpti
 		return nil
 	}
 	fmt.Fprintf(w, "Tracking %d file(s): %s\n", len(filesTouched), strings.Join(filesTouched, ", "))
+	fmt.Fprintln(w, "Review tracked files before committing; adoption attributes current changes in this repo to the adopted session.")
 	return nil
 }
 
@@ -232,9 +233,15 @@ func buildAdoptedSessionState(ctx context.Context, source *session.State) (*sess
 	adopted.Branch = branch
 	adopted.LastInteractionTime = &now
 	adopted.FilesTouched = filesTouched
+
+	// Reset target-local checkpoint bookkeeping. Source checkpoint IDs can point
+	// at metadata in another repository or checkpoint branch; carrying them into
+	// this repo would let amend and turn-finalization paths operate on unrelated
+	// checkpoints.
 	adopted.TurnCheckpointIDs = nil
 	adopted.LastCheckpointID = id.EmptyCheckpointID
 	adopted.LastCheckpointCommitHash = ""
+
 	adopted.FullyCondensed = false
 	adopted.DivergenceNoticeShown = false
 	adopted.UntrackedFilesAtStart = nil
@@ -242,7 +249,7 @@ func buildAdoptedSessionState(ctx context.Context, source *session.State) (*sess
 	adopted.PendingPromptAttribution = nil
 	adopted.PromptWindowBase = 0
 	adopted.PromptWindowResetPending = false
-	adopted.AttachedManually = true
+	adopted.AttachedManually = false
 
 	return &adopted, filesTouched, nil
 }

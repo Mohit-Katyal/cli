@@ -2330,7 +2330,7 @@ func TestCheckpointTokensCmd_JSONOutputWithComparison(t *testing.T) {
 	if result.Comparison.Total.Change != 330 {
 		t.Fatalf("expected total change 330, got %+v", result.Comparison.Total)
 	}
-	if result.Comparison.Total.Direction != "up" {
+	if result.Comparison.Total.Direction != checkpointDeltaDirectionUp {
 		t.Fatalf("expected total direction up, got %+v", result.Comparison.Total)
 	}
 	if result.Comparison.Total.ChangePercent == nil || *result.Comparison.Total.ChangePercent != 60 {
@@ -2436,6 +2436,29 @@ func TestCheckpointTokensCmd_ComparisonNoChange(t *testing.T) {
 		if !strings.Contains(out, check) {
 			t.Errorf("expected %q in output, got:\n%s", check, out)
 		}
+	}
+}
+
+func TestBuildCheckpointMetricDeltaClampsChangeOverflow(t *testing.T) {
+	t.Parallel()
+
+	maxInt := int(^uint(0) >> 1)
+	minInt := -maxInt - 1
+
+	up := buildCheckpointMetricDelta(minInt, maxInt)
+	if up.Change != maxInt {
+		t.Fatalf("upward overflow change = %d, want %d", up.Change, maxInt)
+	}
+	if up.Direction != checkpointDeltaDirectionUp {
+		t.Fatalf("upward overflow direction = %q, want up", up.Direction)
+	}
+
+	down := buildCheckpointMetricDelta(maxInt, minInt)
+	if down.Change != minInt {
+		t.Fatalf("downward overflow change = %d, want %d", down.Change, minInt)
+	}
+	if down.Direction != checkpointDeltaDirectionDown {
+		t.Fatalf("downward overflow direction = %q, want down", down.Direction)
 	}
 }
 

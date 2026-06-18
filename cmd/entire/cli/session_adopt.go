@@ -225,7 +225,12 @@ func buildAdoptedSessionState(ctx context.Context, source *session.State) (*sess
 
 	now := time.Now()
 	adopted := *source
+
+	// Keep the source live transcript path. In cross-repo adoption the transcript
+	// belongs to the continuing agent session, not the target repository; clearing
+	// or recomputing it from the target repo would drop live transcript capture.
 	adopted.CLIVersion = versioninfo.Version
+	adopted.TranscriptPath = source.TranscriptPath
 	adopted.BaseCommit = head.Hash().String()
 	adopted.AttributionBaseCommit = head.Hash().String()
 	adopted.WorktreePath = worktreeRoot

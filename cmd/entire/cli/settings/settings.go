@@ -126,9 +126,29 @@ type EntireSettings struct {
 	// nil/true = sign (default), false = skip signing.
 	SignCheckpointCommits *bool `json:"sign_checkpoint_commits,omitempty"`
 
+	// AdoptPromptAfterCommits controls how many commits made with Entire enabled
+	// in a repo before the champion is offered team adoption (`entire adopt`).
+	// 0/unset uses the default (DefaultAdoptPromptAfterCommits); a negative value
+	// disables the champion prompt entirely. Resolve via AdoptPromptThreshold().
+	AdoptPromptAfterCommits int `json:"adopt_prompt_after_commits,omitempty"`
+
 	// Deprecated: no longer used. Exists to tolerate old settings files
 	// that still contain "strategy": "auto-commit" or similar.
 	Strategy string `json:"strategy,omitempty"`
+}
+
+// DefaultAdoptPromptAfterCommits is the number of Entire-enabled commits in a
+// repo before the champion is nudged to adopt Entire for the team.
+const DefaultAdoptPromptAfterCommits = 3
+
+// AdoptPromptThreshold resolves the effective champion-prompt threshold:
+// the configured value when positive, the default when unset (0), or a negative
+// value (disabled) passed through unchanged so callers can detect it.
+func (s *EntireSettings) AdoptPromptThreshold() int {
+	if s == nil || s.AdoptPromptAfterCommits == 0 {
+		return DefaultAdoptPromptAfterCommits
+	}
+	return s.AdoptPromptAfterCommits
 }
 
 // ClonePreferences stores clone-local, uncommitted preferences that should be

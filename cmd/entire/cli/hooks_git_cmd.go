@@ -8,6 +8,7 @@ import (
 
 	"github.com/entireio/cli/cmd/entire/cli/agent/external"
 	"github.com/entireio/cli/cmd/entire/cli/logging"
+	"github.com/entireio/cli/cmd/entire/cli/onboarding"
 	"github.com/entireio/cli/cmd/entire/cli/settings"
 	"github.com/entireio/cli/cmd/entire/cli/strategy"
 	"github.com/entireio/cli/perf"
@@ -199,6 +200,11 @@ func newHooksGitPostCommitCmd() *cobra.Command {
 
 			hookErr := g.strategy.PostCommit(g.ctx)
 			g.logCompleted(hookErr)
+
+			// Count this as a commit made with Entire enabled (gitHooksDisabled
+			// guards the inactive case above). Best-effort: a counter error must
+			// never disrupt the commit. This feeds the champion adoption nudge.
+			_ = onboarding.IncrementCommitCount(g.ctx) //nolint:errcheck // best-effort value signal
 
 			return nil
 		},

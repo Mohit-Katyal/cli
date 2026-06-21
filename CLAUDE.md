@@ -47,7 +47,17 @@ at the canonical group form.
 
 Top-level lifecycle and standalone commands: `enable`, `disable`, `status`,
 `login`, `logout`, `clean`, `version`, `dispatch`, `activity`, `help`,
-`configure`.
+`configure`, `adopt`.
+
+`adopt` is the repository-level team-onboarding command: it writes committed
+artifacts (`.entire/config`, `.githooks/`, a README section) so teammates are
+prompted at most once whether to use Entire. It is distinct from `enable`, the
+developer-level per-repo integration. The one-time teammate/champion prompts run
+from a gated check in the root `PersistentPostRun` (`maybePromptOnboarding`) and
+the hidden `onboard --check` command; the champion prompt fires only after
+`adopt_prompt_after_commits` (default 3) commits made with Entire enabled. See
+[Team Adoption](docs/architecture/team-adoption.md). There is intentionally no
+`entire setup` command — `enable` already does developer-level setup.
 
 Hidden top-level shortcuts (functional, emit a one-line deprecation hint):
 `resume` → `session resume`, `attach` → `session attach`, `explain` →
@@ -60,7 +70,8 @@ Deprecated top-level commands (functional, print a cobra deprecation message):
 deprecation as `checkpoint rewind`).
 
 Hidden infrastructure commands: `hooks`, `trail`,
-`curl-bash-post-install`, `__send_analytics`.
+`curl-bash-post-install`, `__send_analytics`, `onboard` (`onboard --check`
+drives the one-time team-onboarding prompt from committed git hooks).
 
 The `hideAsAlias(cmd, canonical)` helper in `cmd/entire/cli/aliascmd.go`
 marks a command Hidden and sets cobra's `Deprecated` field so the hint

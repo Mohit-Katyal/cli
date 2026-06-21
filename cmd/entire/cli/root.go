@@ -70,6 +70,11 @@ func NewRootCmd() *cobra.Command {
 			// Version check and notification (synchronous with 2s timeout)
 			// Runs AFTER command completes to avoid interfering with interactive modes
 			versioncheck.CheckAndNotify(cmd.Context(), cmd.OutOrStdout(), versioninfo.Version)
+
+			// One-time, consent-based team-onboarding nudge. A near-instant
+			// no-op unless this is an adopted repo where the developer hasn't
+			// been set up or asked yet. Never disrupts the command above.
+			maybePromptOnboarding(cmd)
 		},
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			ctx := cmd.Context()
@@ -98,7 +103,9 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newRepoCmd())                                                // hidden during maturation; control-plane repo lifecycle
 	cmd.AddCommand(newGrantCmd())                                               // hidden during maturation; control-plane access grants
 	cmd.AddCommand(newCleanCmd())
-	cmd.AddCommand(newSetupCmd()) // 'configure' — non-agent settings; agent CRUD lives under 'agent'
+	cmd.AddCommand(newSetupCmd())   // 'configure' — non-agent settings; agent CRUD lives under 'agent'
+	cmd.AddCommand(newAdoptCmd())   // 'adopt' — repository-level team onboarding
+	cmd.AddCommand(newOnboardCmd()) // 'onboard' — hidden, hook-driven one-time prompt
 	cmd.AddCommand(newEnableCmd())
 	cmd.AddCommand(newDisableCmd())
 	cmd.AddCommand(newStatusCmd())

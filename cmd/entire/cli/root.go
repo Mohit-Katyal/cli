@@ -99,6 +99,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newGrantCmd())                                               // hidden during maturation; control-plane access grants
 	cmd.AddCommand(newCleanCmd())
 	cmd.AddCommand(newSetupCmd()) // 'configure' — non-agent settings; agent CRUD lives under 'agent'
+	cmd.AddCommand(newAdoptCmd()) // 'adopt' — repository-level team adoption (hidden --check drives the teammate prompt)
 	cmd.AddCommand(newEnableCmd())
 	cmd.AddCommand(newDisableCmd())
 	cmd.AddCommand(newStatusCmd())

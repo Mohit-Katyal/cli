@@ -1,0 +1,54 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "f41b09cf3d76",
+  "session_id": "246bdf11-cb99-4ea3-89e9-0236e9c9ce73",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-21T00:38:45.758296Z",
+  "branch": "feat/entire-adopt",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "cmd/entire/cli/onboarding/onboarding.go",
+    "cmd/entire/cli/onboard.go",
+    "cmd/entire/cli/root.go",
+    "cmd/entire/cli/adopt_test.go",
+    "cmd/entire/cli/onboarding/onboarding_test.go",
+    "CLAUDE.md",
+    "docs/architecture/team-adoption.md"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-4-8",
+  "turn_id": "51ab52e720b1",
+  "checkpoint_transcript_start": 669,
+  "transcript_lines_at_start": 669,
+  "token_usage": {
+    "input_tokens": 7531,
+    "cache_creation_tokens": 35258,
+    "cache_read_tokens": 4375291,
+    "output_tokens": 22605,
+    "api_call_count": 17
+  },
+  "session_metrics": {
+    "turn_count": 7
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-21T00:38:45.729156Z",
+    "agent_lines": 57,
+    "agent_removed": 452,
+    "human_added": 291,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 348,
+    "total_lines_changed": 800,
+    "agent_percentage": 63.625,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "f41b09cf3d76",
+  "strategy": "manual-commit",
+  "branch": "feat/entire-adopt",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "CLAUDE.md",
+    "cmd/entire/cli/adopt_test.go",
+    "cmd/entire/cli/onboard.go",
+    "cmd/entire/cli/onboarding/onboarding.go",
+    "cmd/entire/cli/onboarding/onboarding_test.go",
+    "cmd/entire/cli/root.go",
+    "docs/architecture/team-adoption.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/f4/1b09cf3d76/0/metadata.json",
+      "transcript": "/f4/1b09cf3d76/0/full.jsonl",
+      "content_hash": "/f4/1b09cf3d76/0/content_hash.txt",
+      "prompt": "/f4/1b09cf3d76/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 7531,
+    "cache_creation_tokens": 35258,
+    "cache_read_tokens": 4375291,
+    "output_tokens": 22605,
+    "api_call_count": 17
+  }
+}

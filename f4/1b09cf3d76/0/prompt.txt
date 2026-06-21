@@ -1,0 +1,10 @@
+can you break this pr up into multiple prs? one is for creating adopt which creates the files that the other teammates can run. the other is the part that nudges the champion to run entire adopt. the nudging pr relies ont he first pr. also can you make this a lot shorter 
+`adopt` is the repository-level team-onboarding command: it writes committed
+artifacts (`.entire/config`, `.githooks/`, a README section) so teammates are
+prompted at most once whether to use Entire. It is distinct from `enable`, the
+developer-level per-repo integration. The one-time teammate/champion prompts run
+from a gated check in the root `PersistentPostRun` (`maybePromptOnboarding`) and
+the hidden `onboard --check` command; the champion prompt fires only after
+`adopt_prompt_after_commits` (default 3) commits made with Entire enabled. See
+[Team Adoption](docs/architecture/team-adoption.md). There is intentionally no
+`entire setup` command — `enable` already does developer-level setup. .

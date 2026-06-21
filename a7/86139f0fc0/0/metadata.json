@@ -1,0 +1,39 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "a786139f0fc0",
+  "session_id": "246bdf11-cb99-4ea3-89e9-0236e9c9ce73",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-21T00:40:05.69028Z",
+  "branch": "feat/team-adoption-nudge",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "CLAUDE.md"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-4-8",
+  "turn_id": "51ab52e720b1",
+  "checkpoint_transcript_start": 762,
+  "transcript_lines_at_start": 762,
+  "token_usage": {
+    "input_tokens": 11776,
+    "cache_creation_tokens": 15438,
+    "cache_read_tokens": 1103350,
+    "output_tokens": 3093,
+    "api_call_count": 4
+  },
+  "session_metrics": {
+    "turn_count": 7
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-21T00:40:05.66043Z",
+    "agent_lines": 4,
+    "agent_removed": 2,
+    "human_added": 495,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 499,
+    "total_lines_changed": 552,
+    "agent_percentage": 1.0869565217391304,
+    "metric_version": 2
+  }
+}

@@ -3,41 +3,37 @@
   "checkpoint_id": "63c5e9f53a75",
   "session_id": "246bdf11-cb99-4ea3-89e9-0236e9c9ce73",
   "strategy": "manual-commit",
-  "created_at": "2026-06-21T01:17:32.327049Z",
+  "created_at": "2026-06-21T01:25:47.300569Z",
   "branch": "feat/entire-adopt",
   "checkpoints_count": 1,
   "files_touched": [
-    "cmd/entire/cli/adopt_prompt.go",
-    "cmd/entire/cli/adopt.go",
-    "cmd/entire/cli/root.go",
-    "CLAUDE.md",
     "docs/architecture/adopt-command.md"
   ],
   "agent": "Claude Code",
   "model": "claude-opus-4-8",
-  "turn_id": "90cc88fe5cac",
-  "checkpoint_transcript_start": 906,
-  "transcript_lines_at_start": 906,
+  "turn_id": "985008c85042",
+  "checkpoint_transcript_start": 1043,
+  "transcript_lines_at_start": 1043,
   "token_usage": {
-    "input_tokens": 8331,
-    "cache_creation_tokens": 34998,
-    "cache_read_tokens": 10980536,
-    "output_tokens": 22132,
-    "api_call_count": 31
+    "input_tokens": 141,
+    "cache_creation_tokens": 5717,
+    "cache_read_tokens": 2228076,
+    "output_tokens": 4361,
+    "api_call_count": 6
   },
   "session_metrics": {
-    "turn_count": 9
+    "turn_count": 10
   },
   "initial_attribution": {
-    "calculated_at": "2026-06-21T01:17:32.287797Z",
-    "agent_lines": 154,
-    "agent_removed": 36,
-    "human_added": 513,
+    "calculated_at": "2026-06-21T01:25:47.259594Z",
+    "agent_lines": 25,
+    "agent_removed": 1,
+    "human_added": 895,
     "human_modified": 0,
     "human_removed": 0,
-    "total_committed": 667,
-    "total_lines_changed": 703,
-    "agent_percentage": 27.027027027027028,
+    "total_committed": 920,
+    "total_lines_changed": 923,
+    "agent_percentage": 2.8169014084507045,
     "metric_version": 2
   },
   "prompt_attributions": [

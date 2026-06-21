@@ -5,10 +5,6 @@
   "branch": "feat/entire-adopt",
   "checkpoints_count": 1,
   "files_touched": [
-    "CLAUDE.md",
-    "cmd/entire/cli/adopt.go",
-    "cmd/entire/cli/adopt_prompt.go",
-    "cmd/entire/cli/root.go",
     "docs/architecture/adopt-command.md"
   ],
   "sessions": [
@@ -20,10 +16,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 8331,
-    "cache_creation_tokens": 34998,
-    "cache_read_tokens": 10980536,
-    "output_tokens": 22132,
-    "api_call_count": 31
+    "input_tokens": 141,
+    "cache_creation_tokens": 5717,
+    "cache_read_tokens": 2228076,
+    "output_tokens": 4361,
+    "api_call_count": 6
   }
 }

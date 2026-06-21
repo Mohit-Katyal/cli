@@ -1,0 +1,35 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "974d300d6fa5",
+  "strategy": "manual-commit",
+  "branch": "feat/team-adoption-onboarding",
+  "checkpoints_count": 6,
+  "files_touched": [
+    "CLAUDE.md",
+    "cmd/entire/cli/adopt.go",
+    "cmd/entire/cli/adopt_test.go",
+    "cmd/entire/cli/hooks_git_cmd.go",
+    "cmd/entire/cli/onboard.go",
+    "cmd/entire/cli/onboarding/onboarding.go",
+    "cmd/entire/cli/onboarding/onboarding_test.go",
+    "cmd/entire/cli/root.go",
+    "cmd/entire/cli/settings/adopt_threshold_test.go",
+    "cmd/entire/cli/settings/settings.go",
+    "docs/architecture/team-adoption.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/97/4d300d6fa5/0/metadata.json",
+      "transcript": "/97/4d300d6fa5/0/full.jsonl",
+      "content_hash": "/97/4d300d6fa5/0/content_hash.txt",
+      "prompt": "/97/4d300d6fa5/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 26377,
+    "cache_creation_tokens": 287469,
+    "cache_read_tokens": 19688158,
+    "output_tokens": 135200,
+    "api_call_count": 131
+  }
+}

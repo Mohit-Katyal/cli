@@ -1,0 +1,89 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "974d300d6fa5",
+  "session_id": "246bdf11-cb99-4ea3-89e9-0236e9c9ce73",
+  "strategy": "manual-commit",
+  "created_at": "2026-06-21T00:19:46.138427Z",
+  "branch": "feat/team-adoption-onboarding",
+  "checkpoints_count": 6,
+  "save_step_count": 3,
+  "files_touched": [
+    "CLAUDE.md",
+    "cmd/entire/cli/adopt.go",
+    "cmd/entire/cli/adopt_test.go",
+    "cmd/entire/cli/hooks_git_cmd.go",
+    "cmd/entire/cli/onboard.go",
+    "cmd/entire/cli/onboarding/onboarding.go",
+    "cmd/entire/cli/onboarding/onboarding_test.go",
+    "cmd/entire/cli/root.go",
+    "cmd/entire/cli/settings/adopt_threshold_test.go",
+    "cmd/entire/cli/settings/settings.go",
+    "docs/architecture/team-adoption.md"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-4-8",
+  "turn_id": "f7acf50846f7",
+  "token_usage": {
+    "input_tokens": 26377,
+    "cache_creation_tokens": 287469,
+    "cache_read_tokens": 19688158,
+    "output_tokens": 135200,
+    "api_call_count": 131
+  },
+  "session_metrics": {
+    "turn_count": 6
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-06-21T00:19:46.079129Z",
+    "agent_lines": 557,
+    "agent_removed": 2,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 1,
+    "total_committed": 557,
+    "total_lines_changed": 560,
+    "agent_percentage": 99.82142857142857,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 1028,
+      "user_lines_removed": 1,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "cmd/entire/cli/adopt.go": 291,
+        "cmd/entire/cli/adopt_test.go": 205,
+        "cmd/entire/cli/onboard.go": 147,
+        "cmd/entire/cli/onboarding/onboarding.go": 256,
+        "cmd/entire/cli/onboarding/onboarding_test.go": 121,
+        "cmd/entire/cli/root.go": 8
+      },
+      "user_removed_per_file": {
+        "cmd/entire/cli/root.go": 1
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1218,
+      "agent_lines_removed": 1
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1586,
+      "agent_lines_removed": 3
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 1586,
+      "agent_lines_removed": 3
+    }
+  ]
+}

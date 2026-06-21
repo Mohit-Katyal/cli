@@ -1,0 +1,1053 @@
+We need to design and implement a repository adoption flow for the Entire CLI.
+
+Current terminology:
+
+* `entire enable` already exists and enables local session monitoring on a developer's machine.
+* `entire setup` should become the one-time onboarding command for a developer working in a repository.
+* `entire adopt` is a new command that enables team onboarding for an existing repository.
+
+Goal:
+
+When one engineer starts using Entire in a repository and finds value in it, they should be able to enable a lightweight onboarding experience for the rest of their team.
+
+This must work across most common repository types (Node, Python, Go, Rust, Java, etc.) and should not rely on language-specific tooling.
+
+Important constraints:
+
+1. Git cannot automatically execute code after a teammate pulls a repository.
+2. We must never silently install software on another developer's machine.
+3. We should ask teammates at most once whether they want to install/use Entire.
+4. The experience should feel native to Git workflows.
+5. Repository-level setup and developer-level setup must be separate concepts.
+
+Commands:
+
+* `entire enable`
+
+  * Existing command.
+  * Enables Entire locally for the current developer.
+  * Turns on local monitoring/checkpoint collection.
+
+* `entire adopt`
+
+  * New command.
+  * Repository-level action.
+  * Adds files/configuration that help onboard teammates.
+
+* `entire setup`
+
+  * Developer-level action.
+  * Configures local git hooks and local Entire integration for a repository.
+
+Desired repository-owner flow:
+
+A developer starts using Entire in a repository.
+
+At an appropriate moment, Entire should suggest enabling team onboarding.
+
+Examples of good moments:
+
+* After multiple successful checkpoints.
+* After repeated usage in the same repository.
+* After a successful `entire enable`.
+* When Entire detects the repository is not yet Entire-adopted.
+
+Example prompt:
+
+```
+You're using Entire in acme/backend.
+
+Want to enable Entire for the rest of your team?
+
+This will add lightweight onboarding files so teammates are asked once whether they'd like to use Entire.
+
+[Y/n]
+```
+
+If accepted, Entire should run:
+
+```
+entire adopt
+```
+
+Repository adoption design:
+
+`entire adopt` should add a minimal set of repository files such as:
+
+```
+.entire/config
+.githooks/pre-push
+README integration
+```
+
+Avoid modifying build systems unless there is a very strong reason.
+
+Do not require Makefiles.
+
+The solution should work even if the repository is:
+
+* Node
+* Python
+* Go
+* Rust
+* Java
+* Mixed-language
+* Monorepo
+
+Teammate onboarding experience:
+
+After pulling the repository, nothing should automatically execute.
+
+Eventually, when the teammate reaches a natural workflow point, they should be asked once whether they want to install/use Entire.
+
+The preferred UX is terminal-based.
+
+Example:
+
+```
+─────────────────────────────
+This repository uses Entire.
+
+Entire automatically captures coding progress and creates checkpoints so teammates can see work as it evolves.
+
+Learn more:
+https://docs.entire.io/overview
+
+Set up Entire? [Y/n]
+─────────────────────────────
+```
+
+If they answer yes:
+
+* Install Entire if necessary.
+* Run `entire setup`.
+* Optionally run `entire enable` if appropriate.
+* Mark that this user has already been onboarded.
+
+If they answer no:
+
+* Mark that they have already been asked.
+* Never prompt them again.
+
+One-time prompt behavior:
+
+Store onboarding state locally, for example:
+
+```
+.git/entire/prompt-seen
+```
+
+or similar.
+
+Requirements:
+
+* Each developer should only be prompted once.
+* The prompt should not appear repeatedly.
+* The prompt should survive future pulls.
+* The prompt state should not be committed.
+
+Key design question:
+
+Git hooks only work after they are configured locally.
+
+We need the best possible cross-platform, cross-language mechanism to:
+
+1. Get teammates to run `entire setup`.
+2. Prompt them exactly once.
+3. Keep the experience lightweight.
+4. Avoid annoying users.
+
+Please propose:
+
+1. Product design.
+2. User experience flow.
+3. Repository files added by `entire adopt`.
+4. Local files created by `entire setup`.
+5. How onboarding state is stored.
+6. How to maximize adoption while minimizing friction.
+7. Recommended implementation plan.
+8. Concrete code changes for the current CLI codebase.
+
+---
+
+We need to design and implement a repository adoption flow for the Entire CLI.
+
+Current terminology:
+
+* `entire enable` already exists and enables local session monitoring on a developer's machine.
+* `entire setup` should become the one-time onboarding command for a developer working in a repository.
+* `entire adopt` is a new command that enables team onboarding for an existing repository.
+
+Goal:
+
+When one engineer starts using Entire in a repository and finds value in it, they should be able to enable a lightweight onboarding experience for the rest of their team.
+
+This must work across most common repository types (Node, Python, Go, Rust, Java, etc.) and should not rely on language-specific tooling.
+
+Important constraints:
+
+1. Git cannot automatically execute code after a teammate pulls a repository.
+2. We must never silently install software on another developer's machine.
+3. We should ask teammates at most once whether they want to install/use Entire.
+4. The experience should feel native to Git workflows.
+5. Repository-level setup and developer-level setup must be separate concepts.
+
+Commands:
+
+* `entire enable`
+
+  * Existing command.
+  * Enables Entire locally for the current developer.
+  * Turns on local monitoring/checkpoint collection.
+
+* `entire adopt`
+
+  * New command.
+  * Repository-level action.
+  * Adds files/configuration that help onboard teammates.
+
+* `entire setup`
+
+  * Developer-level action.
+  * Configures local git hooks and local Entire integration for a repository.
+
+Desired repository-owner flow:
+
+A developer starts using Entire in a repository.
+
+At an appropriate moment, Entire should suggest enabling team onboarding.
+
+Examples of good moments:
+
+* After multiple successful checkpoints.
+* After repeated usage in the same repository.
+* After a successful `entire enable`.
+* When Entire detects the repository is not yet Entire-adopted.
+
+Example prompt:
+
+```
+You're using Entire in acme/backend.
+
+Want to enable Entire for the rest of your team?
+
+This will add lightweight onboarding files so teammates are asked once whether they'd like to use Entire.
+
+[Y/n]
+```
+
+If accepted, Entire should run:
+
+```
+entire adopt
+```
+
+Repository adoption design:
+
+`entire adopt` should add a minimal set of repository files such as:
+
+```
+.entire/config
+.githooks/pre-push
+README integration
+```
+
+Avoid modifying build systems unless there is a very strong reason.
+
+Do not require Makefiles.
+
+The solution should work even if the repository is:
+
+* Node
+* Python
+* Go
+* Rust
+* Java
+* Mixed-language
+* Monorepo
+
+Teammate onboarding experience:
+
+After pulling the repository, nothing should automatically execute.
+
+Eventually, when the teammate reaches a natural workflow point, they should be asked once whether they want to install/use Entire.
+
+The preferred UX is terminal-based.
+
+Example:
+
+```
+─────────────────────────────
+This repository uses Entire.
+
+Entire automatically captures coding progress and creates checkpoints so teammates can see work as it evolves.
+
+Learn more:
+https://docs.entire.io/overview
+
+Set up Entire? [Y/n]
+─────────────────────────────
+```
+
+If they answer yes:
+
+* Install Entire if necessary.
+* Run `entire setup`.
+* Optionally run `entire enable` if appropriate.
+* Mark that this user has already been onboarded.
+
+If they answer no:
+
+* Mark that they have already been asked.
+* Never prompt them again.
+
+One-time prompt behavior:
+
+Store onboarding state locally, for example:
+
+```
+.git/entire/prompt-seen
+```
+
+or similar.
+
+Requirements:
+
+* Each developer should only be prompted once.
+* The prompt should not appear repeatedly.
+* The prompt should survive future pulls.
+* The prompt state should not be committed.
+
+Key design question:
+
+Git hooks only work after they are configured locally.
+
+We need the best possible cross-platform, cross-language mechanism to:
+
+1. Get teammates to run `entire setup`.
+2. Prompt them exactly once.
+3. Keep the experience lightweight.
+4. Avoid annoying users.
+
+Please propose:
+
+1. Product design.
+2. User experience flow.
+3. Repository files added by `entire adopt`.
+4. Local files created by `entire setup`.
+5. How onboarding state is stored.
+6. How to maximize adoption while minimizing friction.
+7. Recommended implementation plan.
+8. Concrete code changes for the current CLI codebase.
+
+---
+
+<task-notification>
+<task-id>a6e1c8ff98137bab9</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/246bdf11-cb99-4ea3-89e9-0236e9c9ce73/tasks/a6e1c8ff98137bab9.output</output-file>
+<status>completed</status>
+<summary>Agent "Explore enable command and setup" came to rest</summary>
+<note>A task-notification fires each time this agent comes to rest with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Perfect! Now I have enough information. Let me compile the comprehensive report:
+
+## Summary Report: Entire CLI `enable` Command and Setup Flow
+
+Based on my analysis of the codebase, here's a detailed understanding of the existing implementation:
+
+---
+
+### 1. **The `entire enable` Command Implementation**
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/setup.go` (lines 753-935)
+
+**Cobra Command Definition:**
+```go
+cmd := &amp;cobra.Command{
+    Use:   "enable",
+    Short: "Enable Entire in current repository",
+    Long: `Enable Entire with session tracking for your AI agent workflows.
+
+If Entire is not yet configured, this runs the full configuration flow.
+If Entire is already configured but disabled, this re-enables it.
+
+If the current directory is not a git repository, Entire can initialize one
+for you and (optionally) create a matching GitHub repository via the gh CLI.`,
+    RunE: func(cmd *cobra.Command, _ []string) (runErr error) {
+        // ... implementation ...
+    }
+}
+```
+
+**Key Flags:**
+- `--local`, `--project`: Choose settings file location
+- `--agent &lt;name&gt;`: Non-interactive agent setup
+- `--force/-f`: Force reinstall hooks
+- `--skip-push-sessions`: Disable auto-pushing session logs
+- `--checkpoint-remote`: Set checkpoint remote
+- `--telemetry`: Enable/disable telemetry
+- `--absolute-git-hook-path`: Embed full binary path in hooks
+- `--yes/-y`: Accept all defaults non-interactively
+- Bootstrap flags: `--init-repo`, `--no-init-repo`, `--repo-name`, `--repo-owner`, `--repo-visibility`, `--no-github`, etc.
+
+**What it Actually Does (Step-by-Step):**
+
+1. **Bootstrap (if not in a git repo)** (lines 793-829):
+   - Offers to initialize a local git repo via `runGitHubBootstrapInit()`
+   - Phase 1: git init + user identity configuration + GitHub choices (before agent setup)
+   - Phase 2 (deferred): Initial commit + GitHub repo creation + push (after agent setup)
+
+2. **Agent Setup** (lines 840-893):
+   - If `--agent` flag provided: Sets up hooks for that specific agent non-interactively
+   - If already set up: Applies setup-mutating flags or manages agents
+   - If fresh repo: Runs full setup flow (agent detection/selection + hooks + settings)
+
+3. **Setup Flow** (`runSetupFlow`, lines 384-401):
+   - Discovers external agent plugins
+   - Auto-detects or prompts user to select agents
+   - Calls `runEnableInteractive()`
+
+4. **Interactive Enable** (`runEnableInteractive`, lines 1054-1187):
+   - Uninstalls hooks for deselected agents
+   - Installs hooks for selected agents via `setupAgentHooks()`
+   - Creates `.entire/` directory via `setupEntireDirectory()`
+   - Loads existing settings to preserve options
+   - Sets `settings.Enabled = true`
+   - Auto-enables `external_agents` if any selected agent is external
+   - Applies strategy options from flags
+   - **Determines settings file target** (project vs. local)
+   - **Saves settings** to appropriate file
+   - **Installs main git hook** via `strategy.InstallGitHook()`
+   - Checks for Vercel deployment configuration
+   - Prompts for telemetry consent
+   - Runs `strategy.EnsureSetup()`
+   - Prints "Ready." message
+
+**Files Written:**
+- `.entire/settings.json` or `.entire/settings.local.json` (settings merged from flags and interactive prompts)
+- `.entire/sessions/` (session state directory, created by strategy)
+- `.entire/.gitignore` (created by `strategy.EnsureEntireGitignore()`)
+- Git hooks in `$GIT_DIR/hooks/` (or custom hooks path)
+
+**Settings Changed:**
+- `Enabled`: set to true
+- `LocalDev`: if flag provided
+- `AbsoluteGitHookPath`: if flag provided
+- `Telemetry`: prompted or set from flag
+- `StrategyOptions`: checkpoint_remote, push_sessions if flags provided
+- `ExternalAgents`: auto-enabled if external agent selected
+- `SummaryGeneration`: if provider/model flags set
+
+**Git Hooks Installed:**
+- `prepare-commit-msg`
+- `commit-msg`
+- `post-commit`
+- `post-rewrite`
+- `pre-push`
+
+---
+
+### 2. **Existing `entire setup` Command**
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/setup.go` (lines 668-751)
+
+**Important:** There **IS** an existing `setup` command, but it's renamed to `configure` in the Cobra definition.
+
+**Cobra Command Definition:**
+```go
+cmd := &amp;cobra.Command{
+    Use:   "configure",  // NOT "setup"!
+    Short: "Update Entire settings in the current repository",
+    Long: `Update non-agent Entire settings in the current repository.
+
+Manages telemetry, git-hook installation mode, strategy options, and summary
+provider configuration. Agent installation is handled by 'entire agent'.`,
+    // ...
+}
+```
+
+**Functionality:**
+- Updates non-agent settings (telemetry, git-hook mode, strategy options, summary provider)
+- Agent management is separate under `entire agent`
+- Throws error if Entire is not yet configured: "Entire is not configured in this repository yet. Run 'entire enable' first."
+
+**Root Command Registration:** (line 101 in root.go)
+```go
+cmd.AddCommand(newSetupCmd()) // 'configure' — non-agent settings
+```
+
+---
+
+### 3. **Git Hooks Installation**
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/strategy/hooks.go`
+
+**Hook Types Installed** (line 31):
+```go
+var gitHookNames = []string{"prepare-commit-msg", "commit-msg", "post-commit", "post-rewrite", "pre-push"}
+```
+
+**Hook Installation Method:**
+
+**Core.hooksPath vs. .git/hooks:**
+- Uses `git rev-parse --git-path hooks` (line 126) to determine the active hooks directory
+- Respects `core.hooksPath` configuration
+- Handles linked worktrees (uses common hooks directory)
+- Default: `.git/hooks/`
+
+**How Installation Works:**
+
+1. **Get hooks directory** (lines 290-298):
+   ```go
+   func InstallGitHook(ctx context.Context, silent, localDev, absolutePath bool) (int, error) {
+       hooksDir, err := GetHooksDir(ctx)
+       if err != nil {
+           return 0, err
+       }
+       if err := os.MkdirAll(hooksDir, 0o755); err != nil {
+           return 0, fmt.Errorf("failed to create hooks directory: %w", err)
+       }
+   ```
+
+2. **Determine hook command prefix** (line 300):
+   - `localDev=true`: Uses `./scripts/entire-dev` (for development)
+   - `absolutePath=true`: Resolves full binary path via `os.Executable()`
+   - Default: Uses bare `entire` command (relies on PATH)
+
+3. **Build hook specifications** (line 304):
+   - Each hook contains a marker comment: `"Entire CLI hooks"` (line 17)
+   - Each hook delegates to `entire hooks git &lt;subcommand&gt;` with arguments
+
+4. **Back up existing hooks** (lines 312-324):
+   - If a hook exists and doesn't contain the marker, back it up to `&lt;hook&gt;.pre-entire`
+   - Prints notification to stderr
+
+5. **Chain to backup** (lines 327-330):
+   - If backup exists, append chain call at end of hook to run the `.pre-entire` version
+   - Special handling for `post-rewrite` (captures stdin via temp file)
+
+6. **Write hook file** (lines 332-339):
+   - Writes to hook path with executable permissions (0o755)
+   - Only writes if content differs (lines 351-363)
+
+**Example Hook Structure:**
+```bash
+#!/bin/sh
+# Entire CLI hooks
+if command -v entire &gt;/dev/null 2&gt;&amp;1; then
+    entire hooks git prepare-commit-msg "$1" "$2" 2&gt;/dev/null || true
+else
+    # (optional warning if --commit-msg hook)
+fi
+# Chain: run pre-existing hook
+if [ -x "$(dirname "$0")/prepare-commit-msg.pre-entire" ]; then
+    "$(dirname "$0")/prepare-commit-msg.pre-entire" "$@"
+fi
+```
+
+**Hook Marker Identification:**
+- Used to identify Entire-managed hooks: `strings.Contains(string(data), entireHookMarker)` (line 168)
+
+---
+
+### 4. **The `entire disable` Command**
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/setup.go` (lines 1017-1050)
+
+**Cobra Command Definition:**
+```go
+cmd := &amp;cobra.Command{
+    Use:   "disable",
+    Short: "Disable Entire in current repository",
+    Long: `Disable Entire integrations in the current repository.
+
+By default, this command will disable Entire. Hooks will exit silently and commands will
+show a disabled message.
+
+To completely remove Entire integrations from this repository, use --uninstall:
+  - .entire/ directory (settings, logs, metadata)
+  - Git hooks (prepare-commit-msg, commit-msg, post-commit, pre-push)
+  - Session state files (.git/entire-sessions/)
+  - Shadow branches (entire/&lt;hash&gt;)
+  - Agent hooks`,
+}
+```
+
+**Flags:**
+- `--project`: Update `.entire/settings.json` instead of `.entire/settings.local.json`
+- `--uninstall`: Completely remove Entire (destructive)
+- `--force`: Skip confirmation prompt (with `--uninstall`)
+
+**Behavior:**
+
+**Default disable** (`runDisable`, lines 1217-1231):
+- Sets `Enabled = false` in settings
+- Saves to appropriate settings file (local by default, project with flag)
+- Hooks still exist but exit silently (checked by `DisabledMessage` constant, line 1292)
+- Commands show: "Entire is disabled. Run `entire enable` to re-enable."
+
+**With `--uninstall`** (`runUninstall`, lines 2016-2124):
+1. Shows confirmation prompt (unless `--force`)
+2. Removes agent hooks via `removeAgentHooks()` (lowest risk first)
+3. Removes git hooks via `strategy.RemoveGitHook()`:
+   - Removes hooks containing marker
+   - Restores `.pre-entire` backups if they exist
+4. Removes session state files via `removeAllSessionStates()`
+5. Removes `.entire/` directory via `removeEntireDirectory()`
+6. Removes shadow branches via `removeAllShadowBranches()`
+
+---
+
+### 5. **Root Command Registration**
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/root.go` (lines 84-103)
+
+**Command Registration Pattern:**
+```go
+func NewRootCmd() *cobra.Command {
+    cmd := &amp;cobra.Command{
+        Use:     "entire",
+        // ...
+    }
+
+    // Noun groups (canonical homes for subcommands)
+    cmd.AddCommand(newSessionsCmd())        // 'session'
+    cmd.AddCommand(newCheckpointGroupCmd()) // 'checkpoint'
+    cmd.AddCommand(newAgentGroupCmd())      // 'agent'
+    cmd.AddCommand(newAuthCmd())            // 'auth'
+    // ... more groups ...
+
+    // Top-level lifecycle and standalone commands
+    cmd.AddCommand(newSetupCmd())    // 'configure' (line 101)
+    cmd.AddCommand(newEnableCmd())   // 'enable' (line 102)
+    cmd.AddCommand(newDisableCmd())  // 'disable' (line 103)
+    cmd.AddCommand(newStatusCmd())
+    // ... more commands ...
+}
+```
+
+**To register a new command:**
+1. Create a `newCommandNameCmd()` function returning `*cobra.Command`
+2. Add `cmd.AddCommand(newCommandNameCmd())` in `NewRootCmd()`
+
+---
+
+### 6. **Settings Package: Structure and Loading**
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/settings/settings.go`
+
+**EntireSettings Struct** (lines 58-132):
+```go
+type EntireSettings struct {
+    Enabled bool `json:"enabled"`
+    LocalDev bool `json:"local_dev,omitempty"`
+    LogLevel string `json:"log_level,omitempty"`
+    StrategyOptions map[string]any `json:"strategy_options,omitempty"`
+    AbsoluteGitHookPath bool `json:"absolute_git_hook_path,omitempty"`
+    Telemetry *bool `json:"telemetry,omitempty"`
+    Redaction *RedactionSettings `json:"redaction,omitempty"`
+    Review map[string]ReviewConfig `json:"review,omitempty"`
+    ReviewFixAgent string `json:"review_fix_agent,omitempty"`
+    Investigate *InvestigateConfig `json:"investigate,omitempty"`
+    CommitLinking string `json:"commit_linking,omitempty"`
+    ExternalAgents bool `json:"external_agents,omitempty"`
+    SummaryGeneration *SummaryGenerationSettings `json:"summary_generation,omitempty"`
+    Vercel bool `json:"vercel,omitempty"`
+    SummaryTimeoutSeconds int `json:"summary_timeout_seconds,omitempty"`
+    SignCheckpointCommits *bool `json:"sign_checkpoint_commits,omitempty"`
+    Strategy string `json:"strategy,omitempty"` // Deprecated
+}
+```
+
+**Settings File Locations** (lines 25-31):
+```go
+const (
+    EntireSettingsFile = ".entire/settings.json"           // Project-wide (committed)
+    EntireSettingsLocalFile = ".entire/settings.local.json" // Per-developer (not committed)
+    ClonePreferencesFile = "entire/preferences.json"        // In git common dir
+)
+```
+
+**Load() Function** (lines 362-390):
+```go
+func Load(ctx context.Context) (*EntireSettings, error) {
+    // 1. Load .entire/settings.json (base settings)
+    // 2. Apply clone-local preferences from git common dir
+    // 3. Apply .entire/settings.local.json overrides (if exists)
+    // 4. Validate merged settings
+    return loadMergedSettings(...)
+}
+```
+
+**Three-Layer Merge Precedence** (highest to lowest):
+1. **Local overrides** (`.entire/settings.local.json`) — per-developer, not committed
+2. **Clone preferences** (git common dir `entire/preferences.json`) — shared by linked worktrees
+3. **Project settings** (`.entire/settings.json`) — team-wide, committed
+
+**Save Functions:**
+- `Save(ctx, settings)` → saves to `.entire/settings.json` (lines 1274-1278)
+- `SaveLocal(ctx, settings)` → saves to `.entire/settings.local.json` (lines 1279-1283)
+
+**Wrapper Functions** (via `/Users/mohit/Desktop/cli/cmd/entire/cli/config.go`):
+```go
+func LoadEntireSettings(ctx context.Context) (*settings.EntireSettings, error)
+func SaveEntireSettings(ctx context.Context, s *settings.EntireSettings) error
+func SaveEntireSettingsLocal(ctx context.Context, s *settings.EntireSettings) error
+```
+
+**File Existence Handling:**
+- If neither file exists: returns defaults (Enabled=true)
+- If project file exists: uses it as base + applies local overrides
+- If only local file exists: uses it
+- `.local.json` always optional (not committed)
+
+---
+
+### **Key Design Patterns for `entire adopt` and `entire setup`**
+
+Based on this analysis:
+
+1. **Settings Layers**: Use the three-layer merge (project → clone preferences → local) for extensibility
+2. **Flags Pattern**: Check `cmd.Flags().Changed()` to detect which flags were explicitly set
+3. **Non-Interactive Mode**: Use `--yes` to accept defaults; provide `selectFn` callbacks for testing
+4. **Hook Installation**: Always use `strategy.InstallGitHook(ctx, silent, localDev, absolutePath)` from `strategy.hooks`
+5. **Agent Discovery**: Call `external.DiscoverAndRegisterAlways(ctx)` to discover external agents before user selection
+6. **Settings File Target**: Use `settingsTargetFile()` logic to determine project vs. local write location
+7. **Command Registration**: Add to root via `cmd.AddCommand(newCommandNameCmd())`
+8. **Error Handling**: Use `NewSilentError()` for errors that shouldn't print usage; `cmd.SilenceUsage = true` before returning
+
+---
+
+**Root Level Strategy Function for Git Hooks:**
+```go
+func InstallGitHook(ctx context.Context, silent, localDev, absolutePath bool) (int, error)
+```
+Location: `/Users/mohit/Desktop/cli/cmd/entire/cli/strategy/hooks.go`, lines 290-347</result>
+<usage><subagent_tokens>65135</subagent_tokens><tool_uses>20</tool_uses><duration_ms>105851</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>af5ee7e20c298e7e5</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/246bdf11-cb99-4ea3-89e9-0236e9c9ce73/tasks/af5ee7e20c298e7e5.output</output-file>
+<status>completed</status>
+<summary>Agent "Explore hooks, paths, prompts" came to rest</summary>
+<note>A task-notification fires each time this agent comes to rest with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Perfect! Now I have enough information to compile a comprehensive report. Let me create the final summary:
+
+---
+
+## Summary: Entire CLI Infrastructure Exploration
+
+Based on my thorough exploration of the `/Users/mohit/Desktop/cli` codebase, here are the exact infrastructure pieces for your adopt/setup onboarding flow:
+
+---
+
+### 1. **Paths Package – WorktreeRoot, GetGitCommonDir, and Directory Resolution**
+
+**Location:** `/Users/mohit/Desktop/cli/cmd/entire/cli/paths/paths.go`
+
+**Key Functions:**
+
+- **WorktreeRoot()** (lines 67-98): Returns the git worktree root using `git rev-parse --show-toplevel`. Result is cached by current working directory to avoid repeated git subprocess calls. Returns error if not inside a git repository.
+  ```go
+  func WorktreeRoot(ctx context.Context) (string, error)
+  ```
+  
+- **GetGitCommonDir()** (lines 1079-1096) in `/Users/mohit/Desktop/cli/cmd/entire/cli/strategy/common.go`: Returns the shared `.git/` directory using `git rev-parse --git-common-dir`. Handles worktrees correctly (returns main repo's `.git/`, not `.git/worktrees/&lt;id&gt;/`).
+  ```go
+  func GetGitCommonDir(ctx context.Context) (string, error)
+  ```
+
+- **EntireDir** constant (line 20): `.entire` — the infrastructure directory name.
+- **Cache Clearing**: `ClearWorktreeRootCache()` (lines 100-107) and `ClearHooksDirCache()` for testing.
+
+**Related in session/state.go** (lines 438-446):
+- `getGitCommonDir()` helper that resolves `.git/entire-sessions/` via `git rev-parse --git-common-dir`, caching the result per working directory (lines 693-716).
+
+---
+
+### 2. **Repository Identity Detection – Git Remote Parsing**
+
+**Location:** `/Users/mohit/Desktop/cli/cmd/entire/cli/search/github.go`
+
+**Function:** **ParseGitHubRemote()** (lines 12-33)
+```go
+func ParseGitHubRemote(remoteURL string) (owner, repo string, err error)
+```
+- Parses git remote URLs (SSH, https, entire://) to extract `owner/repo`.
+- Validates that the remote resolves to `github.com`.
+- Uses `/Users/mohit/Desktop/cli/cmd/entire/cli/gitremote.ParseURL()` internally.
+
+**Usage example** in `dispatch_wizard.go` (line 538):
+```go
+owner, repoName, err := searchpkg.ParseGitHubRemote(remote.Config().URLs[0])
+// Returns "org/repo" slug for repo identity
+```
+
+**Repo Slug Discovery:** `discoverRepoSlug()` in `/Users/mohit/Desktop/cli/cmd/entire/cli/dispatch_wizard.go` (lines 527-543):
+```go
+func discoverRepoSlug(repoRoot string) string {
+  repo, err := gitrepo.OpenPath(repoRoot)
+  // ... 
+  owner, repoName, err := searchpkg.ParseGitHubRemote(remote.Config().URLs[0])
+  return owner + "/" + repoName
+}
+```
+
+---
+
+### 3. **Interactive Prompt Detection – CanPromptInteractively() and UnderTest()**
+
+**Location:** `/Users/mohit/Desktop/cli/cmd/entire/cli/interactive/interactive.go`
+
+**Function:** **CanPromptInteractively()** (lines 34-59)
+- Checks if TTY-based prompts can be shown.
+- Precedence order:
+  1. `ENTIRE_TEST_TTY=1` forces ON; any other value forces OFF.
+  2. `testing.Testing()` — go test context defaults to OFF.
+  3. Agent subprocess detection: `GEMINI_CLI`, `COPILOT_CLI`, `PI_CODING_AGENT`, `GIT_TERMINAL_PROMPT=0`.
+  4. `CI` environment variable non-empty (de-facto CI convention; `CI=false` is escape hatch).
+  5. `/dev/tty` probe as final fallback.
+
+**Function:** **UnderTest()** (lines 65-67)
+```go
+func UnderTest() bool {
+  return testing.Testing() || os.Getenv(EnvTestTTY) != ""
+}
+```
+
+**Helper:** **IsTerminalWriter()** (lines 86-92) — checks if `io.Writer` is backed by a terminal.
+
+---
+
+### 4. **Confirmation Prompts using huh – NewAccessibleForm and huh.NewConfirm**
+
+**Location:** `/Users/mohit/Desktop/cli/cmd/entire/cli/utils.go`
+
+**NewAccessibleForm()** (lines 24-28):
+```go
+func NewAccessibleForm(groups ...*huh.Group) *huh.Form {
+  return uiform.New(groups...)
+}
+```
+- Wraps huh form creation with Entire's standard theme (Dracula).
+- Switches to accessible mode when `ACCESSIBLE` environment variable is set.
+
+**Concrete Example** in `/Users/mohit/Desktop/cli/cmd/entire/cli/reset.go` (lines 64-74):
+```go
+form := NewAccessibleForm(
+  huh.NewGroup(
+    huh.NewConfirm().
+      Title("Reset session data?").
+      Value(&amp;confirmed),
+  ),
+)
+
+if err := form.Run(); err != nil {
+  return handleFormCancellation(cmd.OutOrStdout(), "Reset", err)
+}
+
+if !confirmed {
+  fmt.Fprintln(cmd.OutOrStdout(), "Reset cancelled.")
+  return nil
+}
+```
+
+**Theme Implementation** in `/Users/mohit/Desktop/cli/cmd/entire/cli/uiform/uiform.go`:
+- `Theme()` (lines 25-27): Returns `huh.ThemeDracula`.
+- `New()` (lines 33-39): Creates form with theme + optional accessibility.
+- `IsAccessibleMode()` (lines 18-20): Checks `ACCESSIBLE` env var.
+
+---
+
+### 5. **Session State Storage – .git/entire-sessions/ Directory and Path Construction**
+
+**Location:** `/Users/mohit/Desktop/cli/cmd/entire/cli/session/state.go`
+
+**Constant:** **SessionStateDirName** (line 26):
+```go
+const SessionStateDirName = "entire-sessions"
+```
+
+**Path Construction:** **StateStore** (lines 431-451):
+```go
+type StateStore struct {
+  stateDir string
+}
+
+// NewStateStore creates a new state store using git common dir
+func NewStateStore(ctx context.Context) (*StateStore, error) {
+  commonDir, err := getGitCommonDir(ctx)
+  if err != nil {
+    return nil, fmt.Errorf("failed to get git common dir: %w", err)
+  }
+  return &amp;StateStore{
+    stateDir: filepath.Join(commonDir, SessionStateDirName),
+  }, nil
+}
+```
+
+**File Layout:**
+- Session state stored at: `.git/entire-sessions/&lt;session-id&gt;.json`
+- State location comment (line 83): `// This is stored in .git/entire-sessions/&lt;session-id&gt;.json`
+
+**Reading/Writing:** 
+- `Load()` (lines 457-497): Reads state file with validation against path traversal.
+- Uses `os.OpenRoot()` and `osroot.ReadFile()` for security (file operations confined to `.git/entire-sessions/`).
+
+**Helper:** `getGitCommonDir()` (lines 693-716)
+```go
+// Uses git rev-parse --git-common-dir with caching by current working directory
+cmd := exec.CommandContext(ctx, "git", "rev-parse", "--git-common-dir")
+```
+
+---
+
+### 6. **Git Hook Scripts – Shell Templates and Embedding**
+
+**Location:** `/Users/mohit/Desktop/cli/cmd/entire/cli/strategy/hooks.go`
+
+**Hook Template Functions** (lines 175-243):
+- `buildHookSpecs()` (lines 175-243): Returns hook specifications for all managed hooks.
+- Managed hook names (line 31): `["prepare-commit-msg", "commit-msg", "post-commit", "post-rewrite", "pre-push"]`
+
+**Concrete Hook Content** (lines 204-241):
+```sh
+#!/bin/sh
+# Entire CLI hooks
+# &lt;hook-specific comment&gt;
+&lt;invocation-command&gt;
+```
+
+Example prepare-commit-msg hook (lines 203-207):
+```go
+{
+  name: "prepare-commit-msg",
+  content: fmt.Sprintf(`#!/bin/sh
+# %s
+%s
+`, entireHookMarker, prepareCommitMsgCmd),
+}
+```
+
+**Hook Marker** (line 17):
+```go
+const entireHookMarker = "Entire CLI hooks"
+```
+
+**Hook Installation** (lines 284-300):
+```go
+func InstallGitHook(ctx context.Context, silent, localDev, absolutePath bool) (int, error)
+```
+- Calls `GetHooksDir()` to get active hooks directory (respects `core.hooksPath`).
+- Writes hook scripts to disk via `buildHookSpecs()`.
+- Returns number of installed hooks.
+
+**Helper Functions:**
+- `GetHooksDir()` (lines 64-89): Returns active hooks directory with caching.
+- `getHooksDirInPath()` (lines 125-139): Uses `git rev-parse --git-path hooks` for resolution.
+- `GetGitDir()` (lines 48-50): Returns git directory via `git rev-parse --git-dir`.
+
+---
+
+### 7. **Agent Hook Lifecycle – UserPromptSubmit and Hook Mechanism**
+
+**Location:** `/Users/mohit/Desktop/cli/cmd/entire/cli/agent/types.go`
+
+**HookType Constants** (lines 8-15):
+```go
+type HookType string
+
+const (
+  HookSessionStart     HookType = "session_start"
+  HookSessionEnd       HookType = "session_end"
+  HookUserPromptSubmit HookType = "user_prompt_submit"
+  HookStop             HookType = "stop"
+  HookPreToolUse       HookType = "pre_tool_use"
+  HookPostToolUse      HookType = "post_tool_use"
+)
+```
+
+**HookInput Struct** (lines 17-36):
+```go
+type HookInput struct {
+  HookType  HookType
+  SessionID string
+  SessionRef string
+  Timestamp  time.Time
+  UserPrompt string  // Set for UserPromptSubmit hooks
+  ToolName   string  // Tool-specific fields
+  ToolUseID  string
+  ToolInput  []byte
+  ToolResponse []byte
+  RawData    map[string]interface{}
+}
+```
+
+**Copilot CLI Lifecycle Implementation** in `/Users/mohit/Desktop/cli/cmd/entire/cli/agent/copilotcli/lifecycle.go`:
+- `HookNames()` (lines 29-40): Returns supported hook verbs (`user-prompt-submitted`, `session-start`, etc.).
+- `ParseHookEvent()` (lines 48-86): Translates agent hooks to normalized Entire lifecycle events.
+- `buildUserPromptSubmitted()` (lines 90-103): Builds event from hook envelope.
+
+**Hook Invocation Flow:**
+1. Agent sends hook payload to stdin of `entire hooks copilot-cli user-prompt-submitted`.
+2. CLI parses hook envelope (JSON).
+3. Calls `ParseHookEvent()` → returns normalized `agent.Event`.
+4. Event triggers session state updates, condensation, or lifecycle callbacks.
+
+**Example Event Structure** (lines 96-103):
+```go
+return &amp;agent.Event{
+  Type:       agent.TurnStart,      // UserPromptSubmit → TurnStart
+  SessionID:  env.SessionID,
+  SessionRef: transcriptRef,        // Transcript path
+  Prompt:     env.Prompt,           // User's text
+  Timestamp:  env.Timestamp,
+}
+```
+
+---
+
+## Quick Reference for Onboarding Flow
+
+| Component | File | Key Function/Const | Purpose |
+|-----------|------|-------------------|---------|
+| **Worktree Detection** | `paths/paths.go` | `WorktreeRoot()` | Get repo root via `git rev-parse --show-toplevel` |
+| **Shared .git Dir** | `strategy/common.go` | `GetGitCommonDir()` | Get `.git/` (handles worktrees) via `git rev-parse --git-common-dir` |
+| **Session State Dir** | `session/state.go` | `.git/entire-sessions/` | Session state files stored here (cached via `StateStore`) |
+| **Repo Identity** | `search/github.go` | `ParseGitHubRemote()` | Extract `owner/repo` from git remote URL |
+| **TTY Detection** | `interactive/interactive.go` | `CanPromptInteractively()` | Decide if prompts can be shown (checks env vars, testing.Testing(), /dev/tty) |
+| **Confirmation Prompts** | `uiform/uiform.go` + `utils.go` | `NewAccessibleForm()` + `huh.NewConfirm()` | Show yes/no prompts with theme &amp; accessibility support |
+| **Git Hooks** | `strategy/hooks.go` | `InstallGitHook()`, `buildHookSpecs()` | Install shell-script hooks; templates in `fmt.Sprintf()` with `#!/bin/sh` |
+| **Agent Hooks** | `agent/types.go`, `agent/copilotcli/lifecycle.go` | `HookUserPromptSubmit`, `ParseHookEvent()` | Lifecycle events (user prompt, session start/end, tool use) fed via stdin |
+
+---
+
+This gives you everything needed to design an adopt/setup flow that:
+1. Detects repo identity (WorktreeRoot + ParseGitHubRemote)
+2. Checks interactive capability (CanPromptInteractively)
+3. Shows onboarding prompts (NewAccessibleForm)
+4. Sets up session state dir (.git/entire-sessions)
+5. Installs hooks (InstallGitHook with shell templates)
+6. Wires agent lifecycle hooks (HookUserPromptSubmit events)</result>
+<usage><subagent_tokens>71100</subagent_tokens><tool_uses>51</tool_uses><duration_ms>138933</duration_ms></usage>
+</task-notification>
+
+---
+
+i don't want to make any changes to the entire enable command. i'm driving towards a shippable feature, i want it to lightly prompt users but i want this to be a very safe change, doesn't affect existing funcitonality, very lightweight change, installation of the tool should work across any machine. this should be a very safe update that doesn't spam the users, asks consent, but still is effective in getting users to adopt this cli tool across repos
+
+---
+
+the idea is, user 1 is already using entire, at some point, entire checks if the repo has the setup files and asks the user if they want to add the setup files so the other users can adopt. then the user runs entire adopt, and the other users at some point get asked 1 time if they would like to download entire, then they install entire and run entire enable for that repo.
+
+---
+
+yeah add to docs as well, and for the nudging do it after 3 commits using entire, but yeah make that adjustable
+
+---
+
+will it take a while

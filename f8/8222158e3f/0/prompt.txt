@@ -31,3 +31,7 @@ okay overall, the file is good, but i need a doc that's human readable, that an 
 ---
 
 do 1, i still don't know what b does.
+
+---
+
+okay so things are good

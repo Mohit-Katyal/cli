@@ -1,0 +1,57 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "7244836d38c8",
+  "session_id": "da0c780a-f6fb-4da7-949a-4fefb38098c9",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-01T06:20:29.56677Z",
+  "branch": "feat/ticket-setup",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "cmd/entire/cli/settings/settings.go",
+    "cmd/entire/cli/ticket/platform.go",
+    "cmd/entire/cli/ticket/creds.go",
+    "cmd/entire/cli/ticket/setup.go",
+    "cmd/entire/cli/ticket/cmd.go",
+    "cmd/entire/cli/ticket/platform_test.go"
+  ],
+  "agent": "Claude Code",
+  "model": "",
+  "turn_id": "659a7c86b6ac",
+  "checkpoint_transcript_start": 544,
+  "transcript_lines_at_start": 544,
+  "compact_transcript_start": 114,
+  "token_usage": {
+    "input_tokens": 431,
+    "cache_creation_tokens": 36634,
+    "cache_read_tokens": 6507193,
+    "output_tokens": 27762,
+    "api_call_count": 22
+  },
+  "session_metrics": {
+    "turn_count": 30
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-01T06:20:29.473572Z",
+    "agent_lines": 323,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 323,
+    "total_lines_changed": 323,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 415,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "cmd/entire/cli/strategy/push_common_cas_test.go": 415
+      }
+    }
+  ]
+}

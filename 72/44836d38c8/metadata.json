@@ -1,0 +1,32 @@
+{
+  "cli_version": "dev",
+  "checkpoint_version": "branch-v1",
+  "checkpoint_id": "7244836d38c8",
+  "strategy": "manual-commit",
+  "branch": "feat/ticket-setup",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "cmd/entire/cli/settings/settings.go",
+    "cmd/entire/cli/ticket/cmd.go",
+    "cmd/entire/cli/ticket/creds.go",
+    "cmd/entire/cli/ticket/platform.go",
+    "cmd/entire/cli/ticket/platform_test.go",
+    "cmd/entire/cli/ticket/setup.go"
+  ],
+  "sessions": [
+    {
+      "metadata": "/72/44836d38c8/0/metadata.json",
+      "transcript": "/72/44836d38c8/0/full.jsonl",
+      "compact_transcript": "/72/44836d38c8/0/transcript.jsonl",
+      "content_hash": "/72/44836d38c8/0/content_hash.txt",
+      "prompt": "/72/44836d38c8/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 431,
+    "cache_creation_tokens": 36634,
+    "cache_read_tokens": 6507193,
+    "output_tokens": 27762,
+    "api_call_count": 22
+  }
+}

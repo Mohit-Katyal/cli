@@ -1,0 +1,1271 @@
+okay so this codebase is essentially trying to beat github. potentially event take it over. please look at the latest features github is adding to make it more ai and see how i cacould apply those to theis repoistory if they don't already exist
+
+---
+
+<task-notification>
+<task-id>a026cb241fa74728f</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/50a173a8-1807-440e-ac50-65a41d64a72d/tasks/a026cb241fa74728f.output</output-file>
+<status>completed</status>
+<summary>Agent "Survey Entire CLI feature surface" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Based on my analysis of the codebase, here's a structured inventory of the Entire CLI:
+
+## Top-Level Commands &amp; Groups
+
+**Core Session Management:**
+- `session` — List, view info, manage active/stopped sessions, resume from branches
+- `checkpoint` — List, explain, search checkpoints; analyze token usage; policy management
+- `tokens` — Token usage diagnostics and per-checkpoint analysis
+
+**Agent &amp; Integration:**
+- `agent` — Install/remove hooks for Claude Code, Codex, Gemini, Cursor, OpenCode, Factory AI Droid, Copilot CLI, Pi
+- `auth` — Login/logout with GitHub device flow
+- `import` — Import pre-existing Claude Code transcripts (hidden)
+
+**Code Review &amp; Investigation:**
+- `review` — Multi-agent code review with profiles (task, agents, judge, output modes); hidden during maturation
+- `investigate` — Multi-agent investigation against branches, GitHub issues, or seed docs; quorum-based termination; subcommands: `fix`, `show`, `clean`
+
+**Activity &amp; Visibility:**
+- `activity` — Show activity overview, repository breakdown, recent commits
+- `dispatch` — Summarize recent agent work (supports local/all-branches/voice filters)
+- `recap` — Summarize checkpoint activity by time range (day/week/month/90d)
+- `search` — Semantic + keyword hybrid search over checkpoints (requires login)
+- `blame` / `why` — Line-by-line attribution to checkpoints; hidden in labs
+
+**Infrastructure &amp; Control-Plane:**
+- `doctor` — Diagnostics (trace, logs, bundle)
+- `org` / `project` / `repo` / `grant` — Control-plane management (hidden)
+- `plugin` — Managed install/list/remove for third-party plugins
+- `mcp` — Model Context Protocol stdio server for MCP-host agents (hidden)
+- `trail` — Manage branch trails (hidden)
+
+**Lifecycle:**
+- `enable` / `disable` — Activate/deactivate Entire in repo
+- `setup` / `configure` — Non-agent settings, checkpoint remote, summary provider
+- `status` — Show Entire status and current session
+- `clean` — Cleanup
+- `version` — Build information
+- `labs` — Discover experimental commands
+
+---
+
+## `review` Command Details
+
+**What it does:** Runs multi-agent code reviews against the current branch. Reviewers run concurrently, then an optional judge consolidates findings. Results print locally or post to branch trails.
+
+**Profile structure:**
+- `task` — review objective
+- `agents` — reviewer slots with optional skills
+- `judge` — consolidator agent (optional)
+- `output` — `local` or `trail`
+
+**Interface:**
+```sh
+entire review --configure        # create/edit profile
+entire review &lt;profile&gt;          # run a profile
+entire review --agent &lt;name&gt;     # run one reviewer
+entire review --findings         # view local findings
+entire review --prompt "focus on X" --timeout 15m --agent claude-code --model opus
+```
+
+---
+
+## Key Features by Theme
+
+**Code Review:**
+- Multi-agent review command with concurrent reviewers + judge consolidation
+- Profile-based configuration (stored in `.entire/settings.json`)
+- Results saved locally and/or posted to branch trails
+
+**Agents/Subagents:**
+- Support for 8 agents: Claude Code, Codex, Gemini, Cursor, OpenCode, Factory AI Droid, Copilot CLI, Pi
+- External agent plugin protocol via `entire-agent-&lt;name&gt;` binaries (subcommand-based JSON over stdio)
+- Hook system (session-start, session-end, stop) for agent lifecycle integration
+
+**Investigation &amp; Dispatch:**
+- `entire investigate` — Multi-agent investigation with GitHub issue seeding (`--issue-link`), quorum-based termination
+- `entire dispatch` — Summarizes AI agent activity across branches/repos
+- Subagent detection via task tool results
+
+**Activity &amp; Search:**
+- `entire activity` — Activity overview, repo breakdown, recent commits (from entire.io backend)
+- `entire search` — Hybrid semantic + keyword search over checkpoint sessions (backend-powered, requires login)
+- `entire dispatch` — voice-configurable summaries (neutral, verbose, etc.)
+
+**MCP Server:**
+- `entire mcp` — Exposes agent-help and CLI status as MCP tools for MCP-host agents
+- Read-only; newline-delimited JSON-RPC 2.0 protocol
+
+**Cloud/Control-Plane Sync:**
+- `org`, `project`, `repo`, `grant` commands for control-plane management (create, list, get, delete)
+- Repo cloning / mirroring / collaborator sync via control-plane
+
+**Search Over Sessions:**
+- `entire search` — Semantic + keyword search powered by Entire backend
+- Requires GitHub authentication via device flow
+
+**Security Scanning:**
+- Automatic secret detection in transcripts during checkpoint condensation
+- Built-in scanners: connection strings, credentials, API keys, PII (opt-in), custom regex rules
+- Optional OpenAI Privacy Filter for sensitive text in CI contexts
+- Skips known safe fields (id, filepath, image, base64)
+
+**Attribution:**
+- `entire blame` — Which lines came from Entire checkpoints (hidden, in labs)
+- `entire why` — Why a line exists: commit, checkpoint, prompt, session (hidden, in labs)
+- Line-by-line traceability to checkpoint metadata
+
+**CI Integration:**
+- Auto-scans checkpoints in non-TTY contexts (CI, pipes)
+- Privacy filter runs automatically in CI when enabled
+- Lifecycle hooks fire during agent events (session-start, -end, stop)
+
+---
+
+## Architecture Documentation
+
+| File | Purpose |
+|------|---------|
+| `sessions-and-checkpoints.md` | Core domain model: Session, Checkpoint (ephemeral vs persistent stores) |
+| `checkpoint-scenarios.md` | Checkpoint lifecycle and rewind protection scenarios |
+| `checkpoint-signing.md` | Cryptographic signing of checkpoint chains |
+| `claude-hooks-integration.md` | Claude Code hook integration; modified file &amp; subagent detection |
+| `external-agent-protocol.md` | Plugin protocol: subcommand-based agent discovery and communication |
+| `review-command.md` | Review profiles, multi-reviewer concurrency, judge consolidation |
+| `agent-guide.md` | Integration checklist and guide for new agents |
+| `attribution.md` | Line-by-line attribution architecture |
+| `external-commands.md` | External command integration mechanism |
+| `logging.md` | Logging and observability |
+| `commit-hook-perf-analysis.md` | Hook performance benchmarks |
+| `copilot-token-validation.md` | Copilot CLI token validation |
+| `upstream-host-resolution.md` | Checkpoint branch host resolution |
+
+---
+
+## Features Competing with GitHub
+
+| GitHub Feature | Entire Equivalent |
+|---|---|
+| PR Reviews | `entire review` — multi-agent review with profiles and judge consolidation |
+| Copilot | Native support for Copilot CLI + 7 other agents (Claude Code, Gemini, Cursor, etc.) |
+| Code Search | `entire search` — semantic + keyword search over agent session content |
+| Insights / Activity | `entire activity` &amp; `entire dispatch` — AI agent work summaries and activity feeds |
+| Security Scanning | Built-in secret detection + optional OpenAI Privacy Filter on checkpoints |
+| Actions / CI | Lifecycle hooks; automatic secret scanning in CI; control-plane dispatch |
+| Codespaces | Session resumption across branches and worktrees via trail checkouts |
+| Issue Integration | `entire investigate --issue-link` seeds multi-agent investigations from GitHub issues/PRs |
+
+**Net positioning:** Entire is a **session/checkpoint management layer** for AI-driven development (agent-agnostic, multi-agent investigation, code review, activity tracking) rather than a PR/Actions/Codespaces replacement. It surfaces the **why** (transcript, prompts, decisions) alongside **what** (commits) for every agent interaction.</result>
+<usage><subagent_tokens>45620</subagent_tokens><tool_uses>47</tool_uses><duration_ms>205030</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>bymtrqvl7</task-id>
+<summary>Monitor event: "Wait for codebase survey agent to finish"</summary>
+<event>[Monitor timed out — re-arm if needed.]</event>
+</task-notification>
+
+---
+
+does #1 exist in our codebase yet? and does it eveen make esense with what we're trying to do? capture context?
+
+---
+
+<task-notification>
+<task-id>a6daf4634c02cece7</task-id>
+<tool-use-id>toolu_01M4GFKoEmyY8ERGYDQxCCtY</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/50a173a8-1807-440e-ac50-65a41d64a72d/tasks/a6daf4634c02cece7.output</output-file>
+<status>completed</status>
+<summary>Agent "Verify live monitoring and agent-launch model" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>## Final Report
+
+Based on my thorough code analysis, here are the answers to your questions:
+
+### QUESTION 1: Live, Real-Time Monitoring Surface
+
+**Direct Answer: PARTIALLY YES, but limited scope.**
+
+**Evidence:**
+- **`entire activity`**: Uses bubbletea TUI (`/Users/mohit/Desktop/cli/cmd/entire/cli/activity_tui.go`) but displays **historical activity**, not live sessions. Data is fetched once and rendered statically.
+  
+- **`entire session list/info/status`**: All **point-in-time snapshots**. `session info --transcript` reads stored transcript files with "snapshot semantics" (bounded to file size at open, excluding subsequent writes).
+  
+- **`entire review`**: **HAS true live monitoring** (`/Users/mohit/Desktop/cli/cmd/entire/cli/review/tui_model.go`, lines 6, 38-48). The TUI renders a per-agent status table **during the run**, receives live `agentEventMsg` events, and supports drill-in inspection of one agent's live event buffer (line 6: "renders a per-agent status table during the run").
+  
+- **No `--watch`, `--follow`, or polling loops** exist for regular session monitoring.
+
+### QUESTION 2: LAUNCH/Drive vs. OBSERVE
+
+**Direct Answer: OBSERVE agents you run (passive) — BUT observe through active spawning for review/investigate.**
+
+**Evidence:**
+
+**Core product = OBSERVE (passive):**
+- Sessions are captured via **agent lifecycle hooks** installed in agent configs:
+  - `/Users/mohit/Desktop/cli/cmd/entire/cli/agent/cursor/hooks.go`: `session-start`, `session-end`, `before-submit-prompt`, `stop`, `pre-compact`, `subagent-start`, `subagent-stop`
+  - These hooks are registered in `.cursor/hooks.json` (line 67) and called **by the agent itself** when events occur
+  - Entire does NOT spawn agent processes for normal work — the user runs agents directly in their IDE (foreground interaction, comments at `/Users/mohit/Desktop/cli/cmd/entire/cli/agent/claudecode/claude.go` and `codex.go`)
+
+**EXCEPTIONS = LAUNCH/DRIVE (active spawning):**
+- **`entire review`**: Uses `exec.CommandContext` to spawn reviewer agents (`/Users/mohit/Desktop/cli/cmd/entire/cli/agent/claudecode/reviewer.go:42`): `cmd := exec.CommandContext(ctx, "claude", args...)`
+- **`entire investigate`**: Uses spawners with `exec.CommandContext` (`/Users/mohit/Desktop/cli/cmd/entire/cli/agent/claudecode/spawner.go:25`): `cmd := exec.CommandContext(ctx, "claude", "-p", "--permission-mode", "bypassPermissions", prompt)`
+- Both run reviewers/investigators **concurrently** with live TUI monitoring
+
+---
+
+### Conclusion (3–4 sentences)
+
+Entire's **core product is "observe agents you run"** — it passively captures sessions via lifecycle hooks that fire when the user runs agents in their IDE. However, **Entire already has agent-spawning machinery**: `entire review` and `entire investigate` spawn concurrent reviewer/investigator agent processes using `exec.CommandContext` with live TUI dashboards monitoring multiple agents simultaneously. This demonstrates that active agent orchestration with live status monitoring is architecturally feasible and already implemented for specific command workflows.</result>
+<usage><subagent_tokens>72894</subagent_tokens><tool_uses>38</tool_uses><duration_ms>111141</duration_ms></usage>
+</task-notification>
+
+---
+
+it looks like entire does a github mirror to backup files. basically its not necessarioly enticing to use it yet. i wast hinking of differetn features, potentially a UI, to make it enticing to use. what do you think ? Mirror existing GitHub repositories on Entire
+Overview
+
+Copy page
+
+Understand how to mirror existing GitHub repositories on Entire.
+
+Repo mirrors let you bring existing GitHub repositories into Entire’s AI-native development workflows, where agents, automation, and humans work with the same Git repositories.
+A mirror exposes an existing GitHub repo as an Entire-backed Git remote. You use it through an entire:// URL, so standard Git commands like clone, fetch, pull, and push can talk to Entire without changing your Git tooling.
+This makes mirrors a low-friction way to try Entire on real code, connect agents or automation to an Entire-backed Git remote, and evaluate Entire in an existing workflow before changing how the broader team works.
+​
+Why Use a Mirror?
+Use a repo mirror when you want to:
+Try Entire’s AI-native development workflows on an existing project, rather than creating a throwaway repo that does not reflect how your team actually works.
+Give agents or scripts an Entire-backed Git remote for code that already lives in GitHub.
+Evaluate Entire in a real workflow without coordinating a team-wide Git remote change. You can start with one checkout, agent, or script.
+Use Entire for clone, fetch, and push workflows while keeping your current GitHub repository and permissions model in place.
+​
+Common Actions
+With a repo mirror, you can:
+Create a mirror for an existing GitHub repository.
+Clone the mirror with an entire:// URL.
+Set an existing local checkout’s Git remote to the mirror URL.
+Push through the mirror to the upstream GitHub repository.
+Restore the original GitHub remote URL if you need to switch back.
+Remove a mirror when you no longer need it.
+For command syntax and flags, see the CLI command reference.
+​
+What to Expect
+Creating a mirror does not delete, move, or rewrite the GitHub repository.
+Changing a local checkout’s remote only updates that checkout’s .git/config. It does not create or delete the server-side mirror.
+Removing a mirror does not change local Git remotes that you already configured.
+​
+Continue with
+Tutorial
+Create a mirror and use it from Git.
+Was this page helpful?
+
+
+Yes
+
+No
+Previous
+Tutorial
+Mirror an existing GitHub repository on Entire and use it with Git.
+Next
+Ask a question...
+ here's whats already exisitng Mirror existing GitHub repositories on Entire
+Tutorial
+
+Copy page
+
+Mirror an existing GitHub repository on Entire and use it with Git.
+
+​
+Prerequisites
+Before you create a mirror, make sure you have:
+The Entire CLI installed. The latest version you should have installed is 0.7.3.
+You have access to clone the GitHub repository you want to mirror
+​
+Verify the Mirror Command Is Available
+entire repo mirror create --help
+If the mirror command is not available, update the Entire CLI to the latest version, 0.7.3.
+​
+Log In
+Log in with the Entire CLI:
+entire login
+Confirm that your login is active:
+entire auth status
+​
+Check GitHub App Access
+Before you create or push through a mirror, confirm that the Entire GitHub App can access the repository.
+Open GitHub installed apps.
+Find Entire.
+If GitHub shows Permission updates requested, click Review request and approve the update.
+Click Configure for Entire.
+To choose which repositories Entire can access, under Repository access, choose All repositories or Only select repositories, then click Save.
+​
+Create the Mirror
+Choose the GitHub repository you want to mirror.
+export GH_OWNER="<owner>"
+export GH_REPO="<repo>"
+Create the mirror placement:
+entire repo mirror create "github.com/$GH_OWNER/$GH_REPO"
+This registers the mirror on Entire. It does not change any local Git checkout.
+The repository can be written as owner/repo, an HTTPS GitHub URL, or an SSH GitHub URL. By default, the command waits until the initial clone is available on Entire.
+The command prints the mirror URL when it succeeds:
+Registered mirror <mirror-id>
+  entire://aws-us-east-2.entire.io/gh/<owner>/<repo>
+  cloning. ready
+​
+Use the Mirror With Git
+To clone the mirror into a new checkout, use the URL printed by entire repo mirror create:
+git clone "entire://aws-us-east-2.entire.io/gh/$GH_OWNER/$GH_REPO"
+From an existing clone of the GitHub repository, point the local origin remote at the mirror:
+cd "$GH_REPO"
+git remote get-url origin
+git remote set-url origin "entire://aws-us-east-2.entire.io/gh/$GH_OWNER/$GH_REPO"
+git fetch origin
+If you want to verify the mirror before changing the checkout’s primary remote, add it temporarily as another remote:
+cd "$GH_REPO"
+git remote add entire "entire://aws-us-east-2.entire.io/gh/$GH_OWNER/$GH_REPO"
+git fetch entire
+These commands only update your local .git/config. They do not create or delete the server-side mirror placement.
+To restore origin to GitHub, set it back to the original GitHub URL:
+git remote set-url origin "git@github.com:$GH_OWNER/$GH_REPO.git"
+​
+Verify Git Still Works
+Run a normal Git command through the configured remote:
+git fetch
+git status
+At this point, your local checkout is using the Entire mirror for Git operations.
+​
+Push Through the Mirror
+Create a test branch, make a small change, then stage and commit it:
+git switch -c mirror-push-test
+echo "Mirror test" >> mirror-test.txt
+git add mirror-test.txt
+git commit -m "Test mirror push"
+Push the commit through the mirror:
+git push -u origin mirror-push-test
+Entire forwards the push through the mirror to the upstream GitHub repository. Your GitHub write access, branch protection rules, and required checks still apply.
+​
+Remove the Mirror
+When you no longer need a mirror, remove the server-side mirror placement:
+entire repo mirror remove "github.com/$GH_OWNER/$GH_REPO"
+This does not delete or rewrite the GitHub repository. It also does not change any local Git remotes you configured in .git/config.
+​
+Troubleshooting
+​
+unknown command "repo"
+Your entire binary may be older than the mirror commands. Update the Entire CLI using the installation instructions, then try again.
+​
+403: Write access to repository not granted
+If git push reaches the Entire mirror but GitHub rejects the forwarded push, check the Entire GitHub App permissions:
+Open GitHub installed apps.
+Find Entire.
+If GitHub shows Permission updates requested, click Review request and approve the update.
+Click Configure for Entire.
+To choose which repositories Entire can access, under Repository access, choose All repositories or Only select repositories, then click Save.
+Refresh your Entire login:
+entire auth logout
+entire auth login
+Retry the push after logging in again.
+​
+doesn't look like a cluster, or it is unreachable
+Git could not reach Entire while using the entire:// remote helper. Retry the command first:
+git clone "entire://aws-us-east-2.entire.io/gh/$GH_OWNER/$GH_REPO"
+If it keeps failing, check your network connection and try again.
+​
+Mirror creation takes a while
+The default create command waits for the initial clone to appear on Entire. For large repositories, that can take time. If you only need to register the placement and check back later, use --no-wait.
+​
+Restore the original GitHub remote
+If you pointed origin at a mirror and want to undo it:
+git remote set-url origin "git@github.com:$GH_OWNER/$GH_REPO.git"
+Was this page helpful?
+
+
+ but can you also look into the code to check what mirrroring entails?
+
+---
+
+<task-notification>
+<task-id>a6b7cf0903f1e9781</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/50a173a8-1807-440e-ac50-65a41d64a72d/tasks/a6b7cf0903f1e9781.output</output-file>
+<status>completed</status>
+<summary>Agent "Investigate repo mirror implementation" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Based on my comprehensive exploration of the codebase, here are the direct answers to your questions:
+
+## 1. **Is the mirror just a passthrough proxy to GitHub, or does Entire store the repo itself?**
+
+**Entire stores the repo itself.** When you run `entire repo mirror create github.com/octocat/hello-world`, the control plane **clones the GitHub repo directly into the cluster** and stores it there. The flow is:
+- CLI calls `c.CreateMirror()` (POST /mirrors on control plane) with owner/repo/clusterHost
+- Control plane initiates a GitHub→Entire clone (status: "processing")
+- The mirror waits until clone completes (status: "ready")
+- Subsequent clones come from Entire's cluster, not GitHub
+
+**Evidence:** `/Users/mohit/Desktop/cli/cmd/entire/cli/repo_mirror.go:201-245` shows `createAndAwaitMirror()` polls the mirror status waiting for the initial clone to reach "ready" or "failed" state. The Mirror struct's status field (line 229) indicates lifecycle: "processing (cloning), ready (clonable), failed (initial clone failed), or suspended" (`/Users/mohit/Desktop/cli/internal/coreapi/oas_schemas_gen.go`).
+
+## 2. **What flows through the entire:// remote helper?**
+
+The entire:// remote helper is a **transparent HTTP proxy for git pack protocol traffic**, not a data storage layer. It does NOT inspect or manipulate git objects:
+- Parses `entire://&lt;cluster&gt;/gh/&lt;owner&gt;/&lt;repo&gt;`
+- Resolves login context → mints repo-scoped tokens
+- Routes git smart-HTTP (git-upload-pack, git-receive-pack) through `transport.Proxy`
+- The Proxy applies failover on 5xx, manages replica nodes via X-Entire-Replicas header, strips auth on out-of-cluster redirects
+- Classifies operations as "push" or "pull" to mint appropriate tokens
+
+**Evidence:** `/Users/mohit/Desktop/cli/cmd/git-remote-entire/main.go:126-156` wires `setAuth` (token exchange) and creates a `transport.Proxy` that runs `githelper.Run()`. The transport (`/Users/mohit/Desktop/cli/internal/remotehelper/transport/proxy.go:1-10`) is explicitly decoupled from auth and "talks to one or more Entire data-plane replicas." githelper.Run delegates to handleConnect/handleStatelessConnect which relay git protocol frames.
+
+## 3. **Does mirroring connect to checkpoint/session/transcript system?**
+
+**No, mirrors are completely decoupled from checkpoints/AI-native features.** There are NO hooks triggered on mirror push, NO checkpoint attachment, NO transcript sync, NO review invocation. The mirror is a pure git storage/routing facility. The checkpoint system has a separate `checkpoint_remote` setting for *pushing checkpoints to a different repo*, not for using a mirror.
+
+**Evidence:** Searching for "mirror" + "checkpoint|transcript|review|session|hook" in `/Users/mohit/Desktop/cli/cmd/entire/cli/` yields zero results connecting them. `repo_mirror.go` defines only CRUD operations on the control plane. The pre-push hook (`/Users/mohit/Desktop/cli/cmd/entire/cli/hooks_git_cmd.go:289-331`) does OPF redaction and checkpoint pushing to a *separate checkpoint_remote*, not to the mirror.
+
+## 4. **What's the server side? (cluster core / entire.io backend)**
+
+**The cluster core is a full git server (stores objects).** It consists of:
+- Control plane (coreapi): REST API accepting CreateMirror / ListMirrors / DeleteMirror at POST/DELETE/GET /mirrors
+- Data plane: Multiple replica nodes hosting git smart-HTTP endpoints (git-upload-pack, git-receive-pack)
+- Replica discovery: Nodes advertise themselves via X-Entire-Replicas header; clients cache via on-disk `nodes.json`
+
+The control plane initiates the upstream clone; the data plane serves clones to users. There is no "thin router"—each data-plane node holds a full clone.
+
+**Evidence:** `transport/proxy.go:38-92` shows NodeConfig with replicas list, failover logic, and replica caching. replicas.go:44-60 loads cached replicas per (cluster, repo) or cold-probes the entry domain.
+
+## 5. **Any hooks/triggers on push?**
+
+**No server-side post-receive hooks are wired.** Pushes are just forwarded to the data plane, which stores objects. There is no indexing, redaction, review trigger, or provenance attachment. Pre-push (OPF, checkpoints) happens client-side only.
+
+**Evidence:** No grep hits for "PostReceive" or "post-receive" in the CLI code. Strategy's PrePush (`/Users/mohit/Desktop/cli/cmd/entire/cli/strategy/manual_commit_push.go:33-135`) handles only checkpoint refs and OPF redaction client-side before git push runs.
+
+---
+
+## Conclusion (5 sentences)
+
+**The mirror is currently a "dumb backup/proxy remote"—Entire clones from GitHub once, stores objects on the cluster, and relays git protocol traffic through data-plane replicas with token minting.** It is completely detached from checkpoints, transcripts, and AI-native workflows; mirroring is purely for availability/perf, not AI value-add. **The architectural surface for injecting AI-native capability is narrow by design: you'd need to either (a) wire post-receive hooks on the data plane to trigger indexing/review/redaction, (b) add mirror-aware logic to the control-plane CreateMirror handler, or (c) tighten the checkpoint_remote config to point mirrors to a checkpoint repo so pushes auto-attach provenance.** Currently, the mirror system has no such integration points—it's a git-only facility. **The only place mutations could be observed is in the git-remote-entire helper's token-exchange layer (where action type is known) or the transport proxy's request path (where you could log/intercept traffic), but both would need server-side changes to act on that signal.**</result>
+<usage><subagent_tokens>57252</subagent_tokens><tool_uses>38</tool_uses><duration_ms>112151</duration_ms></usage>
+</task-notification>
+
+---
+
+lets save these ideas here, i may watn to revisit them. but for now, but yeah lets just do the first two things you've said. are they really not done though? make sure you double check the repo before we do this. also what's the value add? ELI5
+
+---
+
+<task-notification>
+<task-id>a4e0350131deed7d4</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/50a173a8-1807-440e-ac50-65a41d64a72d/tasks/a4e0350131deed7d4.output</output-file>
+<status>completed</status>
+<summary>Agent "Verify mirror-checkpoint link and review-on-push" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Based on thorough grep and file analysis:
+
+## **VERDICT**
+
+### **CAPABILITY A: Mirror ↔ Checkpoint Linkage — FULLY ABSENT**
+
+**Direct evidence:**
+- `repo_mirror.go` (lines 1–501): Zero mentions of "checkpoint" or checkpoint configuration. `createAndAwaitMirror()` and mirror creation wizard never suggest, set, or auto-configure `checkpoint_remote`.
+- `settings.go:1361–1399` (`GetCheckpointRemote()`): `checkpoint_remote` is only defined and read; never set by mirror code.
+- `setup.go:87–99` (`applyStrategyOptions()`): `checkpoint_remote` is set **only** via explicit CLI flags in `entire configure --checkpoint-remote` or `entire enable --checkpoint-remote`, parsing format `provider:owner/repo`. No connection to mirrors.
+- `strategy/manual_commit_push.go:24–135` (`PrePush()`): Pushes checkpoint branches using an optional separate URL derived from `checkpoint_remote`, but mirror creation does **not** populate this setting.
+
+**Conclusion:** Mirror and checkpoint systems are entirely decoupled. A user must manually configure `--checkpoint-remote` after creating a mirror; there is no auto-linkage or suggestion.
+
+---
+
+### **CAPABILITY B: Review-on-Push — DOES NOT EXIST; CANNOT BE BUILT IN THIS REPO**
+
+**Direct evidence:**
+
+1. **No push-triggered review:** `hooks_git_cmd.go:289–331` (`newHooksGitPrePushCmd()`): Delegates to `strategy.PrePush()`.
+   - `strategy/manual_commit_push.go:33–135`: `PrePush()` handles only checkpoint pushing, OPF redaction, and shadow-branch cleanup. No review invocation.
+
+2. **Review is manual-only:** `trail_review_cmd.go:71–290`: All review entry points are explicit CLI commands with `RunE` hooks (e.g., `runTrailReviewDashboard`, `runTrailReviewCommentAdd`). No automatic triggers.
+
+3. **No server-side code in this repo:** 
+   - `/cmd/` contains only two binaries: `entire` (CLI) and `git-remote-entire` (git remote helper for auth+fetch/push).
+   - No `http.ListenAndServe()`, no post-receive handlers, no server-side review logic.
+   - `internal/coreapi/client.go` is a **client** to the Entire control plane (`entire-core`).
+   - Per `docs/architecture/upstream-host-resolution.md:17–23`, this repo is the **CLI client**; server logic lives in backend services: `entire-server` (git), `entire-core` (IdP+API), `entire.io` (web/data API).
+
+**Conclusion:** Review-on-push **does not exist** in this repo and **cannot be built here**—the natural home (server-side post-receive hook) is in the `entire-server` backend, which is not included. This is a client-only repo.
+
+---
+
+**Summary:** Both capabilities are absent. Checkpoint-remote requires manual user configuration; review-on-push requires backend server code not present in this repository.</result>
+<usage><subagent_tokens>50840</subagent_tokens><tool_uses>35</tool_uses><duration_ms>85038</duration_ms></usage>
+</task-notification>
+
+---
+
+for 1 , they push that context to a separate branch, that's how github gets it and for 2, who's adding the AI that checks it? does it already exist on entire?
+
+---
+
+<task-notification>
+<task-id>a8f9dcac705349c00</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/50a173a8-1807-440e-ac50-65a41d64a72d/tasks/a8f9dcac705349c00.output</output-file>
+<status>completed</status>
+<summary>Agent "Verify checkpoint push routing and review executor" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Based on reading the actual code:
+
+---
+
+## QUESTION 1: Checkpoint Branch Push Target
+
+**VERDICT: When `checkpoint_remote` is UNSET, `entire/checkpoints/v1` is pushed to the user's `origin` remote by default. If origin IS the mirror, checkpoints automatically land on Entire's cluster.**
+
+**Evidence:**
+
+- **`/Users/mohit/Desktop/cli/cmd/entire/cli/strategy/checkpoint_remote.go:35-40`** – `pushTarget()` method:
+  ```go
+  func (ps *pushSettings) pushTarget() string {
+    if ps.checkpointURL != "" {
+      return ps.checkpointURL
+    }
+    return ps.remote
+  }
+  ```
+  Returns the remote name (e.g., `origin`) when `checkpointURL` is empty.
+
+- **`checkpoint_remote.go:66-82`** – `resolvePushSettings()` loads the `checkpoint_remote` config. If it's nil (unset):
+  ```go
+  config := s.GetCheckpointRemote()
+  if config == nil {
+    return ps  // ps has empty checkpointURL, remote="&lt;user's remote&gt;"
+  }
+  ```
+  No checkpoint URL is derived; `ps.remote` (the user's push remote) becomes the target.
+
+- **`manual_commit_push.go:112`** – All checkpoint refs are pushed via:
+  ```go
+  if err := pushRefIfNeeded(pushCtx, ps.pushTarget(), ref)
+  ```
+
+- **`manual_commit_push.go:27-32`** – Doc comment confirms behavior: checkpoint branches use `checkpoint_remote` if configured; otherwise implicit fallback to the user's push remote.
+
+**Consequence:** If a user sets `origin = entire://.../gh/owner/repo` (the mirror), the checkpoint branch is automatically pushed to Entire's cluster without additional wiring. A separate `checkpoint_remote` setting is only needed if you want checkpoints on a *different* remote than where the user is pushing their main branch.
+
+---
+
+## QUESTION 2: AI Review Execution
+
+**VERDICT: The reviewer is STRICTLY a local agent binary spawned on the user's machine using their own API key. No Entire-hosted model or server-side inference exists in the codebase.**
+
+**Evidence:**
+
+- **`/Users/mohit/Desktop/cli/cmd/entire/cli/agent/claudecode/reviewer.go:42`** – Direct exec spawn:
+  ```go
+  cmd := exec.CommandContext(ctx, "claude", args...)
+  ```
+  Spawns the local `claude` binary (Claude Code agent CLI) on the user's machine.
+
+- **`reviewer.go:43`** – Uses user's environment:
+  ```go
+  cmd.Env = review.AppendReviewEnv(os.Environ(), "claude-code", cfg, prompt)
+  ```
+  Env vars are inherited from the user's session, so the `claude` process uses the user's configured API credentials.
+
+- **`/Users/mohit/Desktop/cli/cmd/entire/cli/agent/claudecode/spawner.go:25`** – Review spawner also does local exec:
+  ```go
+  cmd := exec.CommandContext(ctx, "claude", "-p", "--permission-mode", "bypassPermissions", prompt)
+  ```
+
+- **No server-side paths:** Grep for `coreapi`, `control-plane`, or review HTTP/gRPC endpoints returns zero results; the review interface in `/review/types/reviewer.go` is agent-agnostic and purely local process management.
+
+**Conclusion:** For `entire review`, the user's own local Claude Code agent (with their own API key) executes the review. The user pays for tokens. Entire provides no hosted model or inference service for review—it's purely an orchestration &amp; integration layer.</result>
+<usage><subagent_tokens>21227</subagent_tokens><tool_uses>15</tool_uses><duration_ms>70839</duration_ms></usage>
+</task-notification>
+
+---
+
+these are the only repos i have access to. based on these can i still do both versions? cli
+Public
+📜 Entire CLI hooks into your Git workflow to capture AI agent sessions as you work. Sessions are indexed alongside commits, creating a searchable record of how …
+ai
+gemini
+developer
+agents
+claude
+developer-platform
+Go
+•
+MIT License
+•
+351
+•
+4.6k
+•
+78
+•
+92
+•
+Updated 3 hours ago
+cli-checkpoints
+Public
+2
+•
+1
+•
+0
+•
+0
+•
+Updated 3 hours ago
+external-agents
+Public
+⚙️ This repository contains standalone external agent binaries that extend the Entire CLI with support for additional AI coding agents.
+Go
+•
+10
+•
+16
+•
+6
+•
+6
+•
+Updated 6 hours ago
+skills
+Public
+✨ Cross-agent skills that help coding agents use Entire context from Checkpoints, sessions, and git history to search past work, explain code, and hand off sess…
+skills
+entire
+JavaScript
+•
+MIT License
+•
+9
+•
+186
+•
+2
+•
+0
+•
+Updated 7 hours ago
+scoop-bucket
+Public
+Scoop bucket for entire-cli binary.
+MIT License
+•
+0
+•
+0
+•
+0
+•
+0
+•
+Updated 9 hours ago
+homebrew-tap
+Public
+Ruby
+•
+MIT License
+•
+2
+•
+1
+•
+0
+•
+2
+•
+Updated 9 hours ago
+entire-judge
+Public
+Hackathon-jury insights plugin for Entire: judge lenses over a submission's brain (deterministic authenticity/effort + LLM-judged prompting/idea-execution), JSO…
+Go
+•
+MIT License
+•
+0
+•
+1
+•
+0
+•
+0
+•
+Updated yesterday
+entire-sem
+Public
+Entity-level semantic checkpoint context plugin for Entire CLI
+C
+•
+MIT License
+•
+1
+•
+6
+•
+0
+•
+0
+•
+Updated yesterday
+git-sync
+Public
+🪩 Mirror git refs from a source remote to a target remote without a local checkout. Packfiles stream directly over Smart HTTP and an in-memory object store.
+Go
+•
+MIT License
+•
+19
+•
+461
+•
+4
+•
+2
+•
+Updated 5 days ago
+large-ref-test
+Public
+TypeScript
+•
+0
+•
+0
+•
+0
+•
+0
+•
+Updated 2 weeks ago
+test-repo
+Public
+A repo to validate entire flows
+Ruby
+•
+3
+•
+2
+•
+0
+•
+0
+•
+Updated 2 weeks ago
+plugin-index
+Public
+0
+•
+0
+•
+0
+•
+0
+•
+Updated 3 weeks ago
+entire-upgrade
+Public
+📟 Plugin for Entire CLI to upgrade to the latest version
+cli
+entire
+Go
+•
+MIT License
+•
+1
+•
+1
+•
+0
+•
+0
+•
+Updated 3 weeks ago
+entire-run
+Public
+📟 Plugin for Entire CLI to run your coding agent
+cli
+entire
+Go
+•
+MIT License
+•
+1
+•
+3
+•
+0
+•
+0
+•
+Updated 3 weeks ago
+auth-go
+Public
+Shareable Go OAuth 2.0 client library for CLIs: RFC 8628 device flow, RFC 8693 token exchange, token storage, and the orchestration layer that ties them togethe…
+Go
+•
+MIT License
+•
+0
+•
+2
+•
+0
+•
+3
+•
+Updated 3 weeks ago
+entire-core-auth-buildkite-plugin
+Public
+Shell
+•
+0
+•
+0
+•
+0
+•
+0
+•
+Updated on May 27
+roger-roger
+Public
+A simple agent to demonstrate how to create a plugin to integrate with the Entire CLI.
+Go
+•
+MIT License
+•
+2
+•
+4
+•
+0
+•
+0
+•
+Updated on May 21
+public-private-validation
+Public
+TypeScript
+•
+0
+•
+0
+•
+0
+•
+0
+•
+Updated on May 9
+pgr
+Public
+PGR is an experimental, stateless MCP code-search server for studying how ranking, latency, and output shaping affect agentic search.
+research
+mcp-server
+Python
+•
+MIT License
+•
+3
+•
+60
+•
+0
+•
+0
+•
+Updated on May 6
+hackathon-demo
+Public
+Entire hackathon demo
+HTML
+•
+1
+•
+0
+•
+1
+•
+0
+•
+Updated on Apr 24
+.github
+Public
+0
+•
+0
+•
+0
+•
+0
+•
+Updated on Apr 19
+claude-plugins
+Public
+Claude Code Plugins by Entire
+MIT License
+•
+3
+•
+6
+•
+1
+•
+0
+•
+Updated on Apr 16
+external-agents-tests
+Public
+GitHub Actions containing E2E tests for external agents
+Go
+•
+1
+•
+0
+•
+0
+•
+0
+•
+Updated on Mar 28
+devcontainer-features
+Public
+Install the Entire CLI in your devcontainers.
+TypeScript
+•
+1
+•
+5
+•
+0
+•
+0
+•
+Updated on Mar 19
+shared
+Public
+1
+•
+0
+•
+0
+•
+0
+•
+Updated on Jan 5
+
+---
+
+what can the git sync do?
+
+---
+
+okay so basically i'm thinking what's the natural next steps for them and maybe make that, it won't be as useful but at least it will show them i see where they're going. they said they're doing things regard ing the software development lifecycle. liek the new way to do it with the context.
+
+---
+
+whats this Provenance MCP for the next agent (
+
+---
+
+wait why cant it do this now, ust use the entire commands. like i just say hey agent feel free to use the entire commands to do this next features,
+
+---
+
+im confused what are those two things and how is that different than existing skills and what value does it provide
+
+---
+
+whats the best way to do 1, and dont they already have entire review
+
+---
+
+<task-notification>
+<task-id>abe53d3fa6efbc3be</task-id>
+<tool-use-id>toolu_01Rob7cAH7H3sUG5Hs2A5iKX</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/50a173a8-1807-440e-ac50-65a41d64a72d/tasks/abe53d3fa6efbc3be.output</output-file>
+<status>completed</status>
+<summary>Agent "Check entire review inputs and intent extraction" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>## Findings: Intent-Aware Review Implementation Status
+
+### 1. **What `entire review` feeds reviewer agents — YES, it includes session intent:**
+
+The review runner already feeds:
+- **Git diff** (commits in scope via `ScopeBaseRef`)
+- **Profile task** (`cfg.Task`)
+- **Per-run prompt** (`cfg.PerRunPrompt`)
+- **Checkpoint/session context** (`cfg.CheckpointContext`)
+
+**Evidence:**
+- `/Users/mohit/Desktop/cli/cmd/entire/cli/review/prompt.go:26` — `ComposeReviewPrompt()` includes:
+  - Line 65-66: `CheckpointContext` appended as a final section
+  - Line 42-44: Profile task included
+  - Line 51-52: Per-run prompt included
+- `/Users/mohit/Desktop/cli/cmd/entire/cli/review/cmd.go:1025-1028` — `CheckpointContext` extracted before runner launch via `deps.ReviewCheckpointContext()`
+
+**The checkpoint context includes human intent:**
+- `/Users/mohit/Desktop/cli/cmd/entire/cli/review_context.go:35-39` — `reviewCheckpointContext()` composes:
+  - **Committed intent:** summaries + original prompts from all checkpoints in scope (lines 78-144)
+  - **In-progress intent:** active session prompts not yet committed (lines 146-221)
+
+---
+
+### 2. **Programmatic extraction of "what the human asked":**
+
+**Direct APIs exist:**
+- `checkpoint.ReadCheckpoint(ctx, store, checkpointID)` → `CheckpointSummary` (includes intent/summary)
+- `checkpoint.ReadSessionContent(ctx, checkpointID, sessionIndex)` → `SessionContent` with `Metadata` (prompts, outcome)
+- `checkpoint.ReadSessionPrompts(ctx, checkpointID, sessionIndex)` → raw prompt string
+- Session state via `session.NewStateStore()` + `List()` (line 176)
+
+**Commands:**
+- `entire explain &lt;id&gt;` — full checkpoint context
+- `entire explain &lt;id&gt; --raw-transcript` — raw session transcript with prompts
+
+**Evidence:**
+- `/Users/mohit/Desktop/cli/cmd/entire/cli/checkpoint/persistent.go:1404` — `ReadSessionPrompts()`
+- `/Users/mohit/Desktop/cli/cmd/entire/cli/checkpoint/persistent.go:1426` — `ReadSessionContent()`
+- `/Users/mohit/Desktop/cli/cmd/entire/cli/review_context.go:329` — reads prompts and summaries per session
+
+---
+
+### 3. **Cleanest extension seam for intent-aware review:**
+
+**Answer: It's already integrated; no extension needed.**
+
+The flow is already wired:
+- **Profile task** (already stored, per-review) → Line 642, cmd.go
+- **Checkpoint context extraction** → Already runs at lines 1025-1028, cmd.go; pulls human prompts from checkpoints/sessions
+- **Composed into prompt** → Already done at ComposeReviewPrompt line 65-66, prompt.go
+
+To customize *how* intent is surfaced, modify:
+1. **Line 270-298** (`reviewCheckpointDetail()`) — how to format summaries
+2. **Line 353-361** (`reviewPromptText()`) — how to extract/truncate prompts
+3. **Line 65-66** (`ComposeReviewPrompt()`) — where to inject it in the final prompt
+
+---
+
+### 4. **Does review already have notion of "did agent do what was asked"?**
+
+**YES — it's captured and fed to reviewers:**
+- `/Users/mohit/Desktop/cli/cmd/entire/cli/review_context.go:35-39` shows `reviewCheckpointContext()` extracts exactly this.
+- Human prompts from each checkpoint's `Metadata.Summary.Intent` + `ReadSessionPrompts()` are parsed (lines 278-296).
+- Each reviewer receives the full prompt+checkpoint summary+session prompts in the composed prompt.
+- The section "Checkpoint context from commits in scope:" + "In-progress session context:" are auto-populated in every review run.
+
+**No linkage needed — already live.** Reviewers see the human's original ask in the prompt context.</result>
+<usage><subagent_tokens>71592</subagent_tokens><tool_uses>23</tool_uses><duration_ms>88425</duration_ms></usage>
+</task-notification>
+
+---
+
+<task-notification>
+<task-id>a12007329c964798a</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/50a173a8-1807-440e-ac50-65a41d64a72d/tasks/a12007329c964798a.output</output-file>
+<status>completed</status>
+<summary>Agent "Map Entire's unfinished frontier" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Based on my investigation of the Entire CLI codebase, here's what the team is actively building but hasn't completed:
+
+---
+
+## Entire CLI Frontier Features (Ranked by Activity &amp; Client-Side Buildability)
+
+**1. Agent-Help Discovery Infrastructure** (Most Active)
+- **What:** Machine-readable command/flag discovery for coding agents; active (`entire mcp` stdio server) and passive (`entire agent-help` text) pathways
+- **Evidence:** Multiple merged PRs in past 2 weeks; 11 commits mentioning agent-help; gating for trails enablement (`agentHelpRequiresTrailsAnnotation`); Factory Droid still being integrated at SessionStart banner
+- **Client-side:** Yes, fully buildable — agent-help command renders live from CLI tree, MCP server reads existing surfaces
+
+**2. MCP (Model Context Protocol) Server**
+- **What:** `/Users/mohit/Desktop/cli/cmd/entire/cli/mcp.go` — stdio server exposing agent-help &amp; status tools for "MCP-host" agents (those without hooks)
+- **Evidence:** `newMCPCmd()` added to root; recent fix for JSON-RPC validation errors (-32600); protocol version 2025-06-18; active integration path for agents on different transports
+- **Client-side:** Yes — read-only stdio protocol, no backend required
+
+**3. Trail System (Context &amp; Session Linking)**
+- **What:** Hidden from `entire help` (line 48: `Hidden: true`) but advertised via agent-help when enabled; ties branch context to agents
+- **Evidence:** `/Users/mohit/Desktop/cli/cmd/entire/cli/trail_cmd.go` with 7 subcommands (watch, resume, review); session adoption across repos/worktrees (recent Merge); `ClonePreferences.TrailsEnabled` cache avoids on-hook auth; requires API enablement check
+- **Client-side:** Mostly yes — core trail/watch/resume logic client-side, but creation/API posting needs backend
+
+**4. Review Command Improvements (Multi-Agent Judicial Review)**
+- **What:** `entire review` with agent-specific runners and judge consolidation; recent timeout tuning (2m→5m, then 10m→20m for reviewer)
+- **Evidence:** Commit 9a471e384 "fail when judge produces no verdict"; RunMarkerFallback still needed for agents without review-runner adapters; 3 files in `/review` package actively modified last 2 weeks
+- **Client-side:** Mixed — core review orchestration client-side, but agent review runners require per-agent implementations
+
+**5. Full Compact Transcript Per Checkpoint**
+- **What:** Each checkpoint now stores full + compact transcript with boundary marker (`CompactTranscriptStart`), enabling better memory efficiency
+- **Evidence:** PR #1581 merged recently; `/cmd/entire/cli/transcript/compact/` refactored; OPF integration for privacy layer at condensation boundary
+- **Client-side:** Yes — transcript chunking/reassembly already client-side
+
+**6. Checkpoint Policy System**
+- **What:** Version coordination for checkpoint metadata format; gates CLI writes if format is newer; `checkpoint_version` and `checkpoint_min_version` settings
+- **Evidence:** Hidden command `/Users/mohit/Desktop/cli/cmd/entire/cli/checkpoint_policy.go`; recent "limit hook policy gate to checkpoint writes" commit; infrastructure complete but rules still being refined
+- **Client-side:** Yes, fully local
+
+**7. Investigate Command (Multi-Agent Issue Triage)**
+- **What:** Multi-turn agent loop for investigating topics/issues; quorum-based termination; settings-driven agent roster
+- **Evidence:** `/cmd/entire/cli/investigate/` package with `Deps` bridge; `HeadHasInvestigateCheckpoint` distinct from review; agent-specific spawn.Spawner wiring; settings: `Investigate.Agents`, `MaxTurns`, `Quorum`
+- **Client-side:** Yes, fully orchestrated client-side with per-agent spawners
+
+**8. Token Profiling &amp; Diagnostics**
+- **What:** `entire tokens profile` — read-only analysis of token hotspots without additional cost (no transcript inspection); signals: cache/context-replay hotspot, API-call amplification, subagent-heavy sessions
+- **Evidence:** `/cmd/entire/cli/tokens_profile.go` complete; 7 signal types defined; checkpoint metadata only (deterministic); appears feature-complete but experimental
+- **Client-side:** Yes — reads checkpoint metadata only
+
+**Runners-up (lower buildability or less active):**
+- **Search** (semantic+keyword hybrid): Hidden, requires auth; interactive TUI; mostly complete
+- **Control-plane** (org, project, repo, grant): Hidden behind labs; API integration done; likely complete but waiting for product readiness
+- **Blame &amp; Why**: Advertised in labs.go but **zero implementation** — pure stubs/aspirations
+
+---
+
+**Key Takeaway:** The frontier is **agent infrastructure** (help discovery, MCP, investigate, review runner integration) + **checkpoint storage refinement** (compact transcripts, OPF gating, policy coordination). Trail system is half-built (client core done, API delivery incomplete). All are buildable client-side; backend integration mainly affects trail posting and control-plane APIs.</result>
+<usage><subagent_tokens>54317</subagent_tokens><tool_uses>40</tool_uses><duration_ms>147168</duration_ms></usage>
+</task-notification>
+
+---
+
+i think there's a intern workng on that so i don't wanna finish it
+
+---
+
+could we somehow link this thing to jira or linear? basicaly i want it to capture context so it can basically do tasks start to finish as an alll in one solution
+
+---
+
+<task-notification>
+<task-id>a45fcebd1170e6766</task-id>
+<tool-use-id>REDACTED</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-mohit-Desktop-cli/50a173a8-1807-440e-ac50-65a41d64a72d/tasks/a45fcebd1170e6766.output</output-file>
+<status>completed</status>
+<summary>Agent "Check tracker integration and task-completion loop" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>## Verdict: External Tracker Integration Status
+
+### 1. **Tracker Integration Today: GitHub-Only**
+
+Only GitHub issues/PRs supported via `gh` CLI. Hard-coded check rejects Jira/Linear:
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/investigate/issuelink.go:162-164`
+- `ResolveIssueLink()` explicitly rejects non-GitHub hosts with error: "only supports GitHub issues and PRs in this release"
+- Fetches via `gh issue view` or `gh pr view` → renders markdown seed-doc
+- Returns title, body, author, labels, comments as structured markdown (safe from injection)
+
+### 2. **What `investigate` Produces: Findings, Not Code Changes**
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/investigate/loop.go:1-27`
+
+Agents append **findings only**:
+- Agents run in round-robin (not parallel), default 2 turns/agent
+- Spawned via `spawner.BuildCmd()` with `-p` (print mode) — no interactivity
+- Agent output discarded; only findings doc mutations persist
+- Quorum-based termination (agents must agree)
+
+**Result:** Analysis-only. No code changes. No commits by investigation agents.
+
+### 3. **`investigate fix` Launches Interactive Agent, Not Autonomous**
+
+**File:** `/Users/mohit/Desktop/cli/cmd/entire/cli/investigate/fix.go:49-94` + `/Users/mohit/Desktop/cli/cmd/entire/cli/agentlaunch/launch.go:21-59`
+
+Flow:
+1. Reads findings from prior investigation
+2. Calls `LaunchFixAgent()` which spawns **normal** interactive session (not `-p` mode)
+3. User (or human) interacts with claude-code in the terminal
+4. Agent can make code changes and commit (hooks enabled)
+5. **User must decide to run fix** — no autonomous "findings → fix → commit → ticket update" pipeline
+
+**Verdict:** Semi-autonomous at best. Requires human gate between investigation and fix.
+
+### 4. **Extension Points to Build Tracker→Agent→Done**
+
+**Existing reusable pieces:**
+
+| Component | File | Reusable? |
+|-----------|------|-----------|
+| **External command resolution** | `/Users/mohit/Desktop/cli/cmd/entire/cli/plugin.go` | YES — kubectl-style `entire &lt;name&gt;` → `entire-&lt;name&gt;` on PATH |
+| **Plugin storage** | `/Users/mohit/Desktop/cli/cmd/entire/cli/plugin_store.go` | YES — `ENTIRE_PLUGIN_DATA_DIR` per-plugin durable storage |
+| **Investigate loop** | `/Users/mohit/Desktop/cli/cmd/entire/cli/investigate/loop.go` | PARTIAL — findings aggregation works; no code-change pathway |
+| **Fix agent launch** | `/Users/mohit/Desktop/cli/cmd/entire/cli/agentlaunch/launch.go` | YES — can spawn agent with context |
+| **Checkpoints** | `/Users/mohit/Desktop/cli/cmd/entire/cli/checkpoint/` | YES — captures session ID, transcript, modifications |
+| **Settings structure** | `/Users/mohit/Desktop/cli/cmd/entire/cli/settings/settings.go` | YES — config for review profiles + investigate; can extend |
+
+**What's MISSING for "ticket → agent → done":**
+
+1. **Ticket fetching** (Jira/Linear API client) — greenfield
+2. **Autonomous orchestration** — no queue/batch system; investigate is interactive-picker-driven
+3. **Ticket update on completion** — greenfield (would need to post back to tracker)
+4. **End-to-end automation** — currently manual gates between investigation and fix
+
+**Honest architecture answer:**
+
+```
+External command resolution ✓ exists
+  ↓
+entire-jira-sync plugin (GREENFIELD)
+  ↓
+  Loop: fetch ticket → run entire investigate --issue-link
+  ↓
+  Run entire investigate fix (REQUIRES HUMAN APPROVAL)
+  ↓
+  Post findings/diff back to Jira (GREENFIELD)
+```
+
+### 5. **Client-Side or Backend?**
+
+**Entirely client-side.** All extension mechanisms live in the repo:
+- **External commands:** kubectl-style; no backend hookups
+- **Plugin system:** Managed dir is `$XDG_DATA_HOME/entire/plugins/bin` (local)
+- **Settings:** `.entire/settings.json` + `.entire/settings.local.json` (local)
+- **No webhooks, no backend API** for tracker sync
+
+Writing `entire-jira-sync` as a plugin + external command is buildable **today**. No backend changes needed. The bottleneck is: **there's no built-in "fully autonomous ticket completion" orchestration** — only interactive investigate-then-fix.
+
+### 6. **Scope for "Pull Linear/Jira Ticket → Agent Takes It Start-to-Finish → Update Ticket"**
+
+| Part | Status | Effort | Notes |
+|------|--------|--------|-------|
+| Fetch ticket (Jira/Linear API) | Greenfield | Small | New code, straightforward REST calls |
+| Run agent on ticket | Reuse `LaunchFixAgent()` | Minimal | Already launches agents with context |
+| Capture result (diff/commit) | Reuse `checkpoint/` metadata | Trivial | Checkpoints already log session + files |
+| Post back to tracker | Greenfield | Small | New code; update ticket status/comment |
+| Autonomous loop (queue/batch) | Greenfield | Medium | Build ticket queue; remove interactive gates |
+| **Total** | **50% reuse** | **Medium** | Glue + autonomous orchestration are new |
+
+---
+
+**Bottom line:** Entire has the building blocks (external commands, agent launching, checkpoint context) but **no integrated tracker support yet**. A client-side plugin can orchestrate Jira/Linear → investigate → fix → ticket-update, but the **fix step remains interactive** (no unattended autonomous mode). To make it fully autonomous, you'd need to add a queue system and remove the human approval gates — that's new architecture, not just integration.</result>
+<usage><subagent_tokens>48313</subagent_tokens><tool_uses>34</tool_uses><duration_ms>93485</duration_ms></usage>
+</task-notification>
+
+---
+
+yeah, think about it more deeply because i like this idea. basically super simply could we add a linear / jira / whatever ticket to the PR as context? hwo hard would that integration be, could i do that today? also could i put that in entire's own format, almost to the point where someone could just create tickets through entire. also coudl we have the agent just grab the ticket through entire work on it until it's cmplete with the context that it has? and keep going? does this even make sense for entire or is this more of just a general agent thing at this poitn
+
+---
+
+okay yeah, just confirm this is possible with the existing linear apis and integrations
+
+---
+
+yes, lets take full advantage of what lienar has to offer. before this, do a quick check to ensure entire isnt already doing this
+
+---
+
+so wait what does phase 1 do, break it down
+
+---
+
+i really like this, is this the best way to link the ticket?yeah i like entire linear -ticket ENG-142 instead of take. also i like your plan above but i also want to make sure this just works anytime, so if'f you've already started a project and you want to link it later bc you forgot it still works
+
+---
+
+okay this is all good, i'm getting excited. last thing is, i don't think we should make the command called lienar, it should be ticket platform agnostic. maybe entire ticket link ENG-142 to link it, unlink to unlink it,  and entire ticket start ENG-142 and entire ticket setup that allows you deicde which platofrm, for now just linear is supported. so you can add the ticekt platform, link a tciket, and start one . does this make sense, what would a standard syntax look like
+
+---
+
+yes  please get sstarted, adn we will put this in sepeareate prs that stack. a base layer for entire ticket, then one for setup, then link  ' unlink then start, and finally one for linear integration, make sure it follows all style and coidng conventionst hat entire uses today

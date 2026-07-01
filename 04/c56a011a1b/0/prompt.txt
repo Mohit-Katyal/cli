@@ -19,3 +19,11 @@ is there is an update ? because if we're flaggin we should update
 ---
 
 that amkes sense. okay this sounds pretty good, lets make the updates. but i do want to be able to test the keychain before pushing this to production
+
+---
+
+can you open the spec doc in google chrome? right now everything opens in xcode, how do i disable that
+
+---
+
+okay overall, the file is good, but i need a doc that's human readable, that an engineering manager would read. can you do 2 things. 1 make a human readable version of this file with better formatting, 2. update the doc based on the comments ive added

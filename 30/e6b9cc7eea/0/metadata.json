@@ -1,0 +1,25 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "30e6b9cc7eea",
+  "session_id": "da0c780a-f6fb-4da7-949a-4fefb38098c9",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-01T18:01:09.618383Z",
+  "branch": "feat/ticket-snapshot",
+  "checkpoints_count": 2,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "",
+  "turn_id": "612c47e33534",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 19655,
+    "cache_creation_tokens": 1360367,
+    "cache_read_tokens": 59891933,
+    "output_tokens": 386795,
+    "api_call_count": 199
+  },
+  "session_metrics": {
+    "turn_count": 43
+  }
+}

@@ -1,0 +1,73 @@
+i'm confused, why doesn't this work here, shouldn't it be on my code base or on my branch. can i open it in a new tab and test it
+
+---
+
+okay this is pretty good. i think start should have the option to create a new branch with this ticket by default and you can insret your naming convention so if its lke myname/ticketid soemthing like that. this should be the default, ask for branch name when starting, and can be skipped if wnat to keep on same branch. also i don't like all the additional instrcuteions we aded after getting th ticket, it should just have the ticket details in there. also how are we storing the token secret and is that safe? finally, what does linking really mean? so we have a ticket description, but are the details captured int he context? something to think about, maybe adding details into the context window int he entire represetnable form and posdsibly updat eit? or have it be a separate seciton  in the way entire stores context today? smething to think abotu
+
+---
+
+okay yeah, lets not launch agents anymore, thats actually extremeley expensive . don't add dryrun back now but just dont launch agent yet
+
+---
+
+can we use the os keychain for testing? will this work on unix and windows. also should we have versions of the ticket? seems like a lot of work but at least the context is correct, just because you might start with ticket context, it you write some code, the ticekt updates, then you need to handle that update, but that ight be an edge case
+
+---
+
+is there is an update ? because if we're flaggin we should update
+
+---
+
+that amkes sense. okay this sounds pretty good, lets make the updates. but i do want to be able to test the keychain before pushing this to production
+
+---
+
+can you open the spec doc in google chrome? right now everything opens in xcode, how do i disable that
+
+---
+
+okay overall, the file is good, but i need a doc that's human readable, that an engineering manager would read. can you do 2 things. 1 make a human readable version of this file with better formatting, 2. update the doc based on the comments ive added
+
+---
+
+do 1, i still don't know what b does.
+
+---
+
+okay so things are good
+
+---
+
+okay fiish
+
+---
+
+okay nice, i'm using a lot of tokens so we shud probably compact this, then i want to go back to clenaing up the archtiecture doc. for now add a spot for telelemetry and make sure to mention its hidden
+
+---
+
+okay lets cleanup the doc . we first need to amke it more pleaseing to the eye, this will be read aas a google docs tech spec. call it entire ticket tech spec , summary is  good, then add like a cod eblock that shows all the commands and has comments next to them sxplainaing what they do. then undert that have a section acalled current state and eplain it's hidden for now similar to the other new features .  i see the overview doc, its good, but i want it to be more of a tech spec that goes through all the things we mentioend int he more detaield doc, i just watn it to look more pleaseing like this overview doc so it's easier to read.
+
+---
+
+yes push
+
+---
+
+hoenstly this is not bad. can you move how it work and the design principle seciton under the technical requirements. put key files under design principle. put roadmap at the end, push
+
+---
+
+mput problem and motivation under summary. put technical requirements under goals and non goals. put current state above alternatives
+
+---
+
+move feature level tradeoffs above apis and testng above security
+
+---
+
+feature level tradeoffs above technical requirements. testing above failure cases
+
+---
+
+put current state above roadmap

@@ -1,0 +1,43 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "2e7dedff0b21",
+  "session_id": "da0c780a-f6fb-4da7-949a-4fefb38098c9",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-01T17:18:33.186052Z",
+  "branch": "feat/ticket-start-branch",
+  "checkpoints_count": 3,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "",
+  "turn_id": "4d54afa5a2a3",
+  "checkpoint_transcript_start": 953,
+  "transcript_lines_at_start": 953,
+  "compact_transcript_start": 203,
+  "token_usage": {
+    "input_tokens": 421,
+    "cache_creation_tokens": 34528,
+    "cache_read_tokens": 7541168,
+    "output_tokens": 37154,
+    "api_call_count": 17
+  },
+  "session_metrics": {
+    "turn_count": 39
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 415,
+      "agent_lines_removed": 0
+    }
+  ]
+}

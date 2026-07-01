@@ -1,0 +1,5 @@
+i'm confused, why doesn't this work here, shouldn't it be on my code base or on my branch. can i open it in a new tab and test it
+
+---
+
+okay this is pretty good. i think start should have the option to create a new branch with this ticket by default and you can insret your naming convention so if its lke myname/ticketid soemthing like that. this should be the default, ask for branch name when starting, and can be skipped if wnat to keep on same branch. also i don't like all the additional instrcuteions we aded after getting th ticket, it should just have the ticket details in there. also how are we storing the token secret and is that safe? finally, what does linking really mean? so we have a ticket description, but are the details captured int he context? something to think about, maybe adding details into the context window int he entire represetnable form and posdsibly updat eit? or have it be a separate seciton  in the way entire stores context today? smething to think abotu

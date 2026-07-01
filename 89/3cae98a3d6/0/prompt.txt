@@ -47,3 +47,7 @@ okay nice, i'm using a lot of tokens so we shud probably compact this, then i wa
 ---
 
 okay lets cleanup the doc . we first need to amke it more pleaseing to the eye, this will be read aas a google docs tech spec. call it entire ticket tech spec , summary is  good, then add like a cod eblock that shows all the commands and has comments next to them sxplainaing what they do. then undert that have a section acalled current state and eplain it's hidden for now similar to the other new features .  i see the overview doc, its good, but i want it to be more of a tech spec that goes through all the things we mentioend int he more detaield doc, i just watn it to look more pleaseing like this overview doc so it's easier to read.
+
+---
+
+yes push

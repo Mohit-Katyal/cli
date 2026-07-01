@@ -1,0 +1,82 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "8a705faf08b4",
+  "session_id": "da0c780a-f6fb-4da7-949a-4fefb38098c9",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-01T16:30:16.576528Z",
+  "branch": "feat/ticket-linear",
+  "checkpoints_count": 6,
+  "save_step_count": 3,
+  "files_touched": [
+    "cmd/entire/cli/ticket/start.go"
+  ],
+  "agent": "Claude Code",
+  "model": "",
+  "turn_id": "81201e0a2ee1",
+  "checkpoint_transcript_start": 812,
+  "transcript_lines_at_start": 812,
+  "compact_transcript_start": 170,
+  "token_usage": {
+    "input_tokens": 387,
+    "cache_creation_tokens": 821399,
+    "cache_read_tokens": 4710208,
+    "output_tokens": 36055,
+    "api_call_count": 15
+  },
+  "session_metrics": {
+    "turn_count": 36
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-01T16:30:16.455819Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 12,
+    "human_modified": 93,
+    "human_removed": 0,
+    "total_committed": 12,
+    "total_lines_changed": 106,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 415,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "cmd/entire/cli/strategy/push_common_cas_test.go": 415
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 11
+    },
+    {
+      "checkpoint_number": 3,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 11
+    },
+    {
+      "checkpoint_number": 4,
+      "user_lines_added": 57,
+      "user_lines_removed": 47,
+      "agent_lines_added": 455,
+      "agent_lines_removed": 11,
+      "user_added_per_file": {
+        "cmd/entire/cli/ticket/start.go": 48,
+        "cmd/entire/cli/ticket/start_test.go": 9
+      },
+      "user_removed_per_file": {
+        "cmd/entire/cli/ticket/start.go": 46,
+        "cmd/entire/cli/ticket/start_test.go": 1
+      }
+    }
+  ]
+}

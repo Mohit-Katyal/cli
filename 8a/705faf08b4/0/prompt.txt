@@ -1,0 +1,21 @@
+okay how do i test this
+
+---
+
+which linear token should i get , personal or member api
+
+---
+
+can you do this for me REDACTED https://linear.app/mohit-personal/issue/MOH-56/issue-0
+
+---
+
+how do i see what information i got from linear
+
+---
+
+and then how do i update that if i've updated the ticket in linear, does it automatically update?
+
+---
+
+can you show me what we've stored ? or whats the command to see what we've stored

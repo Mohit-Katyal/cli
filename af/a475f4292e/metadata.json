@@ -1,0 +1,25 @@
+{
+  "cli_version": "dev",
+  "checkpoint_version": "branch-v1",
+  "checkpoint_id": "afa475f4292e",
+  "strategy": "manual-commit",
+  "branch": "feat/ticket-spec",
+  "checkpoints_count": 2,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/af/a475f4292e/0/metadata.json",
+      "transcript": "/af/a475f4292e/0/full.jsonl",
+      "compact_transcript": "/af/a475f4292e/0/transcript.jsonl",
+      "content_hash": "/af/a475f4292e/0/content_hash.txt",
+      "prompt": "/af/a475f4292e/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 19661,
+    "cache_creation_tokens": 1372017,
+    "cache_read_tokens": 61473064,
+    "output_tokens": 394999,
+    "api_call_count": 202
+  }
+}

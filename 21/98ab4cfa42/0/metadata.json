@@ -11,6 +11,7 @@
   "agent": "Claude Code",
   "model": "claude-opus-4-8[1m]",
   "turn_id": "2906f12516b4",
+  "compact_transcript_start": 0,
   "token_usage": {
     "input_tokens": 37240,
     "cache_creation_tokens": 1891882,

@@ -132,6 +132,7 @@ ResolveFromBranch(branch) (id, ok)      // infer the ticket id from a branch nam
 | `ticket.Snapshot` | (nested in `Link`) | `{Title, State, URL, Digest, FetchedAt}` |
 | `ticket.State` | — | normalized enum: todo / in_progress / in_review / done / unknown |
 | `ticket.statusReport` | `--json` output | machine-readable status |
+| `checkpoint.TicketRef` | `entire/checkpoints/v1` (per-session `metadata.json` `ticket`) | `{Platform, ID, Title, State, URL, Digest, FetchedAt}` — durable provenance |
 
 ---
 
@@ -313,26 +314,29 @@ once the surface is stable; command-usage telemetry then turns on automatically
 (see [Observability](#observability)).
 
 **Built:** `setup`, `status`, `link` / `unlink`, `start` (branch creation +
-prompt), `revoke-token`, the Linear provider, snapshot + drift detection, and
-`--json` status — all unit-tested and lint-clean.
+prompt), `revoke-token`, the Linear provider, snapshot + drift detection,
+`--json` status, and **checkpoint-level capture** (the linked ticket is frozen
+into each committed checkpoint's metadata on `entire/checkpoints/v1`) — all
+unit- and integration-tested and lint-clean.
 
 ---
 
 ## Open questions
 
-- Schema/location for the frozen ticket snapshot in checkpoint metadata.
 - Drift refresh cadence (every fetch vs. an explicit `sync`).
 - Team-shared vs. local link state.
+- Read surface for captured provenance (e.g. `checkpoint explain` / review
+  showing the ticket the work was grounded in).
 
 ---
 
 ## Roadmap
 
 1. **Ship the command surface** *(done)* — link, context, status.
-2. **Capture into checkpoint context** *(next)* — freeze the ticket snapshot
-   into each checkpoint's metadata → powers `explain` / `why` /
-   review-against-intent, and yields **ticket versioning for free** (checkpoint
-   chain = ticket timeline).
+2. **Capture into checkpoint context** *(done)* — the ticket snapshot is frozen
+   into each committed checkpoint's metadata on `entire/checkpoints/v1`, giving
+   **ticket versioning for free** (checkpoint chain = ticket timeline). Next:
+   surface it in `explain` / `why` / review-against-intent (read side).
 3. **Write-back** — wire `Comment` / `SetState` into a command: post the review
    verdict + PR link, move the ticket to In Review / Done.
 4. **More providers** — Jira, GitHub Issues, Asana, ClickUp, Azure Boards via

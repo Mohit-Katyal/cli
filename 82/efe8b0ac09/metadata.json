@@ -1,0 +1,25 @@
+{
+  "cli_version": "dev",
+  "checkpoint_version": "branch-v1",
+  "checkpoint_id": "82efe8b0ac09",
+  "strategy": "manual-commit",
+  "branch": "wip/ticket-rebuild",
+  "checkpoints_count": 3,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/82/efe8b0ac09/0/metadata.json",
+      "transcript": "/82/efe8b0ac09/0/full.jsonl",
+      "compact_transcript": "/82/efe8b0ac09/0/transcript.jsonl",
+      "content_hash": "/82/efe8b0ac09/0/content_hash.txt",
+      "prompt": "/82/efe8b0ac09/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 37619,
+    "cache_creation_tokens": 1911546,
+    "cache_read_tokens": 111866214,
+    "output_tokens": 646017,
+    "api_call_count": 355
+  }
+}

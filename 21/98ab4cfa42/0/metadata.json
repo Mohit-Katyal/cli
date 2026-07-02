@@ -1,0 +1,24 @@
+{
+  "cli_version": "0.7.8",
+  "checkpoint_id": "2198ab4cfa42",
+  "session_id": "da0c780a-f6fb-4da7-949a-4fefb38098c9",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-02T03:50:02.381691Z",
+  "branch": "wip/ticket-rebuild",
+  "checkpoints_count": 3,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-4-8[1m]",
+  "turn_id": "2906f12516b4",
+  "token_usage": {
+    "input_tokens": 37240,
+    "cache_creation_tokens": 1891882,
+    "cache_read_tokens": 108585695,
+    "output_tokens": 627418,
+    "api_call_count": 342
+  },
+  "session_metrics": {
+    "turn_count": 62
+  }
+}

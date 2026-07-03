@@ -1,0 +1,25 @@
+{
+  "cli_version": "dev",
+  "checkpoint_version": "branch-v1",
+  "checkpoint_id": "bb2173911eb1",
+  "strategy": "manual-commit",
+  "branch": "docs/ticket-command-reference",
+  "checkpoints_count": 1,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/bb/2173911eb1/0/metadata.json",
+      "transcript": "/bb/2173911eb1/0/full.jsonl",
+      "compact_transcript": "/bb/2173911eb1/0/transcript.jsonl",
+      "content_hash": "/bb/2173911eb1/0/content_hash.txt",
+      "prompt": "/bb/2173911eb1/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 39762,
+    "cache_creation_tokens": 309701,
+    "cache_read_tokens": 20946383,
+    "output_tokens": 117140,
+    "api_call_count": 152
+  }
+}

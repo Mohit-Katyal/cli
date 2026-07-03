@@ -1,0 +1,40 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "822668e90de0",
+  "session_id": "20f1369f-55ef-4724-b0fc-0013a7d9f2f0",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-03T20:56:10.363328Z",
+  "branch": "feat/ticket-checkpoint-capture",
+  "checkpoints_count": 5,
+  "save_step_count": 1,
+  "files_touched": [
+    "cmd/entire/cli/review_context.go",
+    "cmd/entire/cli/review_context_test.go"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-4-8[1m]",
+  "turn_id": "8325b8e8e7f2",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 25023,
+    "cache_creation_tokens": 209598,
+    "cache_read_tokens": 13125641,
+    "output_tokens": 72950,
+    "api_call_count": 111
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-03T20:56:10.306548Z",
+    "agent_lines": 120,
+    "agent_removed": 1,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 120,
+    "total_lines_changed": 121,
+    "agent_percentage": 100,
+    "metric_version": 2
+  }
+}

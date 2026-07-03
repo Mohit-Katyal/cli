@@ -216,6 +216,38 @@ bridge to avoid an import cycle with per-agent packages):
 
 ---
 
+## Read surfaces (observe-only)
+
+Once a ticket is captured, it is surfaced across the CLI's read paths so the
+intent the work was grounded in travels with the work. **This is deliberately
+observe-only** — nothing here mutates the tracker (see [Write-back](#roadmap),
+which is intentionally the next step, not part of this slice).
+
+Two shapes feed the surfaces, resolved through shared helpers in
+`cmd/entire/cli/ticket_display.go` (`formatTicketLinkLine` /
+`formatTicketRefLine` / `ticketBriefFromLink`), so every surface renders the
+same and none re-implements formatting:
+
+| Surface | Source | Shows |
+| --- | --- | --- |
+| `checkpoint explain` | frozen `Metadata.Ticket` (per-checkpoint) | a `ticket` header row + URL; `--json` gains a `ticket` object per session |
+| `entire status` | live `LinkForBranch` (current branch) | a `Ticket ·` line under the branch; `--json` gains a top-level `ticket` |
+| `entire session info` | live `LinkForBranch` (session's recorded branch) | a `Ticket:` row + `--json` field; `session current` inherits it |
+| `entire review` | live `LinkForBranch` (current branch) | prepends a "Linked ticket (original intent…)" block to the reviewer's context |
+
+Design rules shared by all four:
+
+- **Frozen vs. live is intentional.** `explain` reads the *captured* snapshot
+  (durable provenance of what the ticket looked like at condense time); the
+  live-branch surfaces read the *current* link so they reflect present state.
+- **Best-effort, never blocking.** A missing link or lookup error omits the
+  line; no surface fails or slows because of ticket state. Reads are local
+  (link store), so there is no network round-trip on these paths.
+- **`session list` is deliberately excluded** — a branch-scoped ticket would
+  repeat per row; it stays a compact one-card-per-session view.
+
+---
+
 ## Testing
 
 - **Unit (hermetic, mostly parallel):** parsing, slugify, state mapping, prompt
@@ -315,9 +347,16 @@ once the surface is stable; command-usage telemetry then turns on automatically
 
 **Built:** `setup`, `status`, `link` / `unlink`, `start` (branch creation +
 prompt), `revoke-token`, the Linear provider, snapshot + drift detection,
-`--json` status, and **checkpoint-level capture** (the linked ticket is frozen
-into each committed checkpoint's metadata on `entire/checkpoints/v1`) — all
-unit- and integration-tested and lint-clean.
+`--json` status, **checkpoint-level capture** (the linked ticket is frozen
+into each committed checkpoint's metadata on `entire/checkpoints/v1`), and the
+**observe-only read surfaces** that display it (`checkpoint explain`,
+`entire status`, `session info`, and `review` grounding — see
+[Read surfaces](#read-surfaces-observe-only)) — all unit- and
+integration-tested and lint-clean.
+
+**Not built (deliberate):** write-back. The provider's `Comment` / `SetState`
+mutations are implemented but unwired — no lifecycle trigger calls them yet, so
+the tracker is never mutated. Closing the loop is the next slice, not this one.
 
 ---
 
@@ -325,8 +364,9 @@ unit- and integration-tested and lint-clean.
 
 - Drift refresh cadence (every fetch vs. an explicit `sync`).
 - Team-shared vs. local link state.
-- Read surface for captured provenance (e.g. `checkpoint explain` / review
-  showing the ticket the work was grounded in).
+- Write-back triggers & safety: which lifecycle events fire `Comment` /
+  `SetState` (PR open / review pass / merge), how state names map per team, and
+  how drift (ticket changed since capture) gates a status move.
 
 ---
 
@@ -335,10 +375,16 @@ unit- and integration-tested and lint-clean.
 1. **Ship the command surface** *(done)* — link, context, status.
 2. **Capture into checkpoint context** *(done)* — the ticket snapshot is frozen
    into each committed checkpoint's metadata on `entire/checkpoints/v1`, giving
-   **ticket versioning for free** (checkpoint chain = ticket timeline). Next:
-   surface it in `explain` / `why` / review-against-intent (read side).
-3. **Write-back** — wire `Comment` / `SetState` into a command: post the review
-   verdict + PR link, move the ticket to In Review / Done.
-4. **More providers** — Jira, GitHub Issues, Asana, ClickUp, Azure Boards via
+   **ticket versioning for free** (checkpoint chain = ticket timeline).
+3. **Surface it (read side)** *(done)* — observe-only display across
+   `checkpoint explain`, `entire status`, `session info`, and review grounding
+   (see [Read surfaces](#read-surfaces-observe-only)).
+4. **Write-back** *(next)* — wire the already-implemented `Comment` / `SetState`
+   into a lifecycle trigger. Sequenced low-risk first: (a) idempotent
+   comment-back on PR open (post PR link + grounded checkpoint ids), then
+   (b) gated status transitions (→ In Review / Done) behind explicit config, a
+   per-team state map, and a drift guard that refuses to clobber a ticket that
+   changed since capture.
+5. **More providers** — Jira, GitHub Issues, Asana, ClickUp, Azure Boards via
    the `Provider` interface (each ~an adapter).
-5. **GitHub-like connection** — deeper PR ↔ ticket wiring, status automation.
+6. **GitHub-like connection** — deeper PR ↔ ticket wiring, status automation.

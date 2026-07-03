@@ -1,0 +1,25 @@
+{
+  "cli_version": "dev",
+  "checkpoint_version": "branch-v1",
+  "checkpoint_id": "4182c78e4520",
+  "strategy": "manual-commit",
+  "branch": "feat/ticket-checkpoint-capture",
+  "checkpoints_count": 5,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/41/82c78e4520/0/metadata.json",
+      "transcript": "/41/82c78e4520/0/full.jsonl",
+      "compact_transcript": "/41/82c78e4520/0/transcript.jsonl",
+      "content_hash": "/41/82c78e4520/0/content_hash.txt",
+      "prompt": "/41/82c78e4520/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 25019,
+    "cache_creation_tokens": 208017,
+    "cache_read_tokens": 12761134,
+    "output_tokens": 71736,
+    "api_call_count": 109
+  }
+}

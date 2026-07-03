@@ -1,0 +1,17 @@
+hey so where are we in adding hte linear ticket ot hte chcekpoint?
+
+---
+
+just very simply , is the ticket information kept on the checkpoint ? like when i chekc my pr, will i see it there?
+
+---
+
+yeah can you add it appropriately to dthe different files in a checkpint. like content_hash.txt , full.jsonl etc
+
+---
+
+what about the inner metadata.json, the prompt text
+
+---
+
+but yeah what you have makes sense. add it to checkpoint explian status, and review are we storing the link in medatada.json or the snapshot that we've aptured

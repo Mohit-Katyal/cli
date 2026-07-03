@@ -1,0 +1,44 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "4182c78e4520",
+  "session_id": "20f1369f-55ef-4724-b0fc-0013a7d9f2f0",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-03T20:55:12.030792Z",
+  "branch": "feat/ticket-checkpoint-capture",
+  "checkpoints_count": 5,
+  "save_step_count": 1,
+  "files_touched": [],
+  "agent": "Claude Code",
+  "model": "claude-opus-4-8[1m]",
+  "turn_id": "8325b8e8e7f2",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 25019,
+    "cache_creation_tokens": 208017,
+    "cache_read_tokens": 12761134,
+    "output_tokens": 71736,
+    "api_call_count": 109
+  },
+  "session_metrics": {
+    "turn_count": 5
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 415,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0,
+      "user_added_per_file": {
+        "cmd/entire/cli/strategy/push_common_cas_test.go": 415
+      }
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 805,
+      "agent_lines_removed": 3
+    }
+  ]
+}

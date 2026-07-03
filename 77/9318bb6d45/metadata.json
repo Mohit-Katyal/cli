@@ -1,0 +1,30 @@
+{
+  "cli_version": "dev",
+  "checkpoint_version": "branch-v1",
+  "checkpoint_id": "779318bb6d45",
+  "strategy": "manual-commit",
+  "branch": "feat/ticket-checkpoint-capture",
+  "checkpoints_count": 5,
+  "files_touched": [
+    "cmd/entire/cli/explain.go",
+    "cmd/entire/cli/explain_export.go",
+    "cmd/entire/cli/explain_export_test.go",
+    "cmd/entire/cli/explain_test.go"
+  ],
+  "sessions": [
+    {
+      "metadata": "/77/9318bb6d45/0/metadata.json",
+      "transcript": "/77/9318bb6d45/0/full.jsonl",
+      "compact_transcript": "/77/9318bb6d45/0/transcript.jsonl",
+      "content_hash": "/77/9318bb6d45/0/content_hash.txt",
+      "prompt": "/77/9318bb6d45/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 25021,
+    "cache_creation_tokens": 208942,
+    "cache_read_tokens": 12942925,
+    "output_tokens": 72331,
+    "api_call_count": 110
+  }
+}

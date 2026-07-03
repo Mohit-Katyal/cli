@@ -1,0 +1,25 @@
+{
+  "cli_version": "dev",
+  "checkpoint_version": "branch-v1",
+  "checkpoint_id": "bd43123ccacc",
+  "strategy": "manual-commit",
+  "branch": "docs/ticket-read-surfaces",
+  "checkpoints_count": 4,
+  "files_touched": null,
+  "sessions": [
+    {
+      "metadata": "/bd/43123ccacc/0/metadata.json",
+      "transcript": "/bd/43123ccacc/0/full.jsonl",
+      "compact_transcript": "/bd/43123ccacc/0/transcript.jsonl",
+      "content_hash": "/bd/43123ccacc/0/content_hash.txt",
+      "prompt": "/bd/43123ccacc/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 37469,
+    "cache_creation_tokens": 262926,
+    "cache_read_tokens": 19885737,
+    "output_tokens": 106976,
+    "api_call_count": 142
+  }
+}

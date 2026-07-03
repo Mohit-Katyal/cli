@@ -43,3 +43,23 @@ oops i meant to click one on the last question
 ---
 
 okay this is pretty good, now can you make a separate architecture document thats similar to the ones created, that isn't necessarily as detaield as this one, but follows the conventions of the other similar features. maybe like etnire review
+
+---
+
+push if you havent, whats it called
+
+---
+
+yes
+
+---
+
+can we downlaod the large arcitechture doc as a .docx or pdf that displays correctly? when i upload it to google chrome it doesn't show up as well as it does on github, but i'm just looking to send a well formatted file into the discord, it won't end up living on the github. the only thing to li e on the github is the arch doc we just made thats similar to the other entire arch docs
+
+---
+
+nice, so now please remove ticket command and ticket command overview from github if we hae them in any of our branhcedsl the only doc we want to commit is ticket.md
+
+---
+
+wait i meant to press 1

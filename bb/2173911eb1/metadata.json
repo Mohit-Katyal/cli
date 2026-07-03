@@ -4,7 +4,7 @@
   "checkpoint_id": "bb2173911eb1",
   "strategy": "manual-commit",
   "branch": "docs/ticket-command-reference",
-  "checkpoints_count": 1,
+  "checkpoints_count": 4,
   "files_touched": null,
   "sessions": [
     {
@@ -16,10 +16,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 39762,
-    "cache_creation_tokens": 309701,
-    "cache_read_tokens": 20946383,
-    "output_tokens": 117140,
-    "api_call_count": 152
+    "input_tokens": 40535,
+    "cache_creation_tokens": 358589,
+    "cache_read_tokens": 23311892,
+    "output_tokens": 153054,
+    "api_call_count": 181
   }
 }

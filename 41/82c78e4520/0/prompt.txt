@@ -15,3 +15,7 @@ what about the inner metadata.json, the prompt text
 ---
 
 but yeah what you have makes sense. add it to checkpoint explian status, and review are we storing the link in medatada.json or the snapshot that we've aptured
+
+---
+
+are there any other appropriate caommdns that this ticke tshould show up in ? if not , lets make the rbanches similar to how we had them in before, where they each exist as a asingle entity adn can be plugged in.

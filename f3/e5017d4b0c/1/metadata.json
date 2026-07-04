@@ -1,0 +1,44 @@
+{
+  "cli_version": "dev",
+  "checkpoint_id": "f3e5017d4b0c",
+  "session_id": "20a8c439-9b01-402e-9831-9953f77a1dec",
+  "strategy": "manual-commit",
+  "created_at": "2026-07-04T18:53:04.206359Z",
+  "branch": "feat/ticket-status",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "cmd/entire/cli/ticket/cmd.go",
+    "cmd/entire/cli/ticket/link.go",
+    "cmd/entire/cli/ticket/linkstore.go",
+    "cmd/entire/cli/ticket/snapshot.go",
+    "cmd/entire/cli/ticket/snapshot_test.go",
+    "cmd/entire/cli/ticket/start.go",
+    "cmd/entire/cli/ticket/status.go",
+    "cmd/entire/cli/ticket/status_test.go"
+  ],
+  "agent": "Claude Code",
+  "model": "claude-opus-4-8[1m]",
+  "turn_id": "92f2b71f698b",
+  "checkpoint_transcript_start": 269,
+  "transcript_lines_at_start": 269,
+  "compact_transcript_start": 60,
+  "token_usage": {
+    "input_tokens": 14,
+    "cache_creation_tokens": 3751,
+    "cache_read_tokens": 933017,
+    "output_tokens": 2030,
+    "api_call_count": 7
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-07-04T18:53:04.172776Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 354,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 354,
+    "total_lines_changed": 354,
+    "agent_percentage": 0,
+    "metric_version": 2
+  }
+}

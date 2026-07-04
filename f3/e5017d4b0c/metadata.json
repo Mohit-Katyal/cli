@@ -3,9 +3,18 @@
   "checkpoint_version": "branch-v1",
   "checkpoint_id": "f3e5017d4b0c",
   "strategy": "manual-commit",
-  "branch": "wip/ticket-rebuild",
-  "checkpoints_count": 3,
-  "files_touched": null,
+  "branch": "feat/ticket-status",
+  "checkpoints_count": 4,
+  "files_touched": [
+    "cmd/entire/cli/ticket/cmd.go",
+    "cmd/entire/cli/ticket/link.go",
+    "cmd/entire/cli/ticket/linkstore.go",
+    "cmd/entire/cli/ticket/snapshot.go",
+    "cmd/entire/cli/ticket/snapshot_test.go",
+    "cmd/entire/cli/ticket/start.go",
+    "cmd/entire/cli/ticket/status.go",
+    "cmd/entire/cli/ticket/status_test.go"
+  ],
   "sessions": [
     {
       "metadata": "/f3/e5017d4b0c/0/metadata.json",
@@ -13,13 +22,20 @@
       "compact_transcript": "/f3/e5017d4b0c/0/transcript.jsonl",
       "content_hash": "/f3/e5017d4b0c/0/content_hash.txt",
       "prompt": "/f3/e5017d4b0c/0/prompt.txt"
+    },
+    {
+      "metadata": "/f3/e5017d4b0c/1/metadata.json",
+      "transcript": "/f3/e5017d4b0c/1/full.jsonl",
+      "compact_transcript": "/f3/e5017d4b0c/1/transcript.jsonl",
+      "content_hash": "/f3/e5017d4b0c/1/content_hash.txt",
+      "prompt": ""
     }
   ],
   "token_usage": {
-    "input_tokens": 37617,
-    "cache_creation_tokens": 1911056,
-    "cache_read_tokens": 111606606,
-    "output_tokens": 644844,
-    "api_call_count": 354
+    "input_tokens": 37631,
+    "cache_creation_tokens": 1914807,
+    "cache_read_tokens": 112539623,
+    "output_tokens": 646874,
+    "api_call_count": 361
   }
 }

@@ -3,15 +3,11 @@
   "checkpoint_id": "165966a7fa40",
   "session_id": "20f1369f-55ef-4724-b0fc-0013a7d9f2f0",
   "strategy": "manual-commit",
-  "created_at": "2026-07-04T03:01:48.615682Z",
+  "created_at": "2026-07-04T03:03:49.206034Z",
   "branch": "feat/ticket-link",
   "checkpoints_count": 11,
   "save_step_count": 1,
-  "files_touched": [
-    "docs/architecture/ticket-command-overview.md",
-    "docs/architecture/ticket-command.md",
-    "entire-dev"
-  ],
+  "files_touched": [],
   "agent": "Claude Code",
   "model": "claude-opus-4-8[1m]",
   "turn_id": "eeb14f218ae5",
@@ -25,17 +21,5 @@
   },
   "session_metrics": {
     "turn_count": 25
-  },
-  "initial_attribution": {
-    "calculated_at": "2026-07-04T03:01:48.524646Z",
-    "agent_lines": 524,
-    "agent_removed": 0,
-    "human_added": 390,
-    "human_modified": 0,
-    "human_removed": 0,
-    "total_committed": 914,
-    "total_lines_changed": 914,
-    "agent_percentage": 57.330415754923415,
-    "metric_version": 2
   }
 }

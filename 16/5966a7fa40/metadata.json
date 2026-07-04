@@ -4,8 +4,13 @@
   "checkpoint_id": "165966a7fa40",
   "strategy": "manual-commit",
   "branch": "feat/ticket-link",
-  "checkpoints_count": 14,
+  "checkpoints_count": 15,
   "files_touched": [
+    "cmd/entire/cli/ticket/cmd.go",
+    "cmd/entire/cli/ticket/link.go",
+    "cmd/entire/cli/ticket/linkstore.go",
+    "cmd/entire/cli/ticket/linkstore_test.go",
+    "cmd/entire/cli/ticket/provider_resolve.go",
     "docs/architecture/ticket-command-overview.md",
     "docs/architecture/ticket-command.md",
     "entire-dev"
@@ -24,14 +29,21 @@
       "compact_transcript": "/16/5966a7fa40/1/transcript.jsonl",
       "content_hash": "/16/5966a7fa40/1/content_hash.txt",
       "prompt": "/16/5966a7fa40/1/prompt.txt"
+    },
+    {
+      "metadata": "/16/5966a7fa40/2/metadata.json",
+      "transcript": "/16/5966a7fa40/2/full.jsonl",
+      "compact_transcript": "/16/5966a7fa40/2/transcript.jsonl",
+      "content_hash": "/16/5966a7fa40/2/content_hash.txt",
+      "prompt": ""
     }
   ],
   "token_usage": {
-    "input_tokens": 78583,
-    "cache_creation_tokens": 2395807,
-    "cache_read_tokens": 136864275,
-    "output_tokens": 815037,
-    "api_call_count": 557
+    "input_tokens": 78898,
+    "cache_creation_tokens": 2403846,
+    "cache_read_tokens": 137821491,
+    "output_tokens": 820718,
+    "api_call_count": 566
   },
   "combined_attribution": {
     "calculated_at": "2026-07-04T03:01:48.834044Z",

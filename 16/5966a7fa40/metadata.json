@@ -3,9 +3,13 @@
   "checkpoint_version": "branch-v1",
   "checkpoint_id": "165966a7fa40",
   "strategy": "manual-commit",
-  "branch": "wip/ticket-rebuild",
-  "checkpoints_count": 3,
-  "files_touched": null,
+  "branch": "feat/ticket-link",
+  "checkpoints_count": 14,
+  "files_touched": [
+    "docs/architecture/ticket-command-overview.md",
+    "docs/architecture/ticket-command.md",
+    "entire-dev"
+  ],
   "sessions": [
     {
       "metadata": "/16/5966a7fa40/0/metadata.json",
@@ -13,13 +17,20 @@
       "compact_transcript": "/16/5966a7fa40/0/transcript.jsonl",
       "content_hash": "/16/5966a7fa40/0/content_hash.txt",
       "prompt": "/16/5966a7fa40/0/prompt.txt"
+    },
+    {
+      "metadata": "/16/5966a7fa40/1/metadata.json",
+      "transcript": "/16/5966a7fa40/1/full.jsonl",
+      "compact_transcript": "/16/5966a7fa40/1/transcript.jsonl",
+      "content_hash": "/16/5966a7fa40/1/content_hash.txt",
+      "prompt": "/16/5966a7fa40/1/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 37476,
-    "cache_creation_tokens": 1904417,
-    "cache_read_tokens": 110069892,
-    "output_tokens": 638696,
-    "api_call_count": 348
+    "input_tokens": 78583,
+    "cache_creation_tokens": 2395807,
+    "cache_read_tokens": 136864275,
+    "output_tokens": 815037,
+    "api_call_count": 557
   }
 }

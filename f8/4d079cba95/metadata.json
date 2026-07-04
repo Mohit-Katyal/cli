@@ -1,6 +1,5 @@
 {
   "cli_version": "dev",
-  "checkpoint_version": "branch-v1",
   "checkpoint_id": "f84d079cba95",
   "strategy": "manual-commit",
   "branch": "feat/ticket-linear",
@@ -39,7 +38,7 @@
     "api_call_count": 442
   },
   "combined_attribution": {
-    "calculated_at": "2026-07-04T19:20:29.043586Z",
+    "calculated_at": "2026-07-04T21:07:28.045559Z",
     "agent_lines": 2,
     "agent_removed": 2,
     "human_added": 537,

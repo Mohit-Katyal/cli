@@ -1,0 +1,105 @@
+hey so where are we in adding hte linear ticket ot hte chcekpoint?
+
+---
+
+just very simply , is the ticket information kept on the checkpoint ? like when i chekc my pr, will i see it there?
+
+---
+
+yeah can you add it appropriately to dthe different files in a checkpint. like content_hash.txt , full.jsonl etc
+
+---
+
+what about the inner metadata.json, the prompt text
+
+---
+
+but yeah what you have makes sense. add it to checkpoint explian status, and review are we storing the link in medatada.json or the snapshot that we've aptured
+
+---
+
+are there any other appropriate caommdns that this ticke tshould show up in ? if not , lets make the rbanches similar to how we had them in before, where they each exist as a asingle entity adn can be plugged in.
+
+---
+
+yeah cleanup whatever to get this into prod andm kae sur eot push apporopriate branches to git and display the table of all brances
+
+---
+
+yeah please send the links
+
+---
+
+is this good or do youthink i should do some write back capabilities to the tickets or moving the ticket status
+
+---
+
+yeah i like this , observe only is good. lets push these prs s if they aren't already. and update the architecture doc
+
+---
+
+oops i meant to click one on the last question
+
+---
+
+okay this is pretty good, now can you make a separate architecture document thats similar to the ones created, that isn't necessarily as detaield as this one, but follows the conventions of the other similar features. maybe like etnire review
+
+---
+
+push if you havent, whats it called
+
+---
+
+yes
+
+---
+
+can we downlaod the large arcitechture doc as a .docx or pdf that displays correctly? when i upload it to google chrome it doesn't show up as well as it does on github, but i'm just looking to send a well formatted file into the discord, it won't end up living on the github. the only thing to li e on the github is the arch doc we just made thats similar to the other entire arch docs
+
+---
+
+nice, so now please remove ticket command and ticket command overview from github if we hae them in any of our branhcedsl the only doc we want to commit is ticket.md
+
+---
+
+wait i meant to press 1
+
+---
+
+okay please give me the table or tables of prs
+
+---
+
+can you basically make two tables, it seems like the ticket sruface depends on the stuff above but is its own sepeate set of information being displayed
+
+---
+
+can you give me acopy and pasta ble table for discord
+
+---
+
+can you add links ? ideally in the text
+
+---
+
+can you give me quick summary that includes the main commands we've created to send in discord
+
+---
+
+wording is a bti aggressive, i'm trying to be nice but serious
+
+---
+
+please inc ldue a line abotu hwo wi used linear at sliderule and block andthis iwas my inpsiration for the idea to fully automate the ticket
+
+---
+
+so i'm thinking of making a super short video , ideally 30-60 seocnds, that shows the main things it does, i'll show setup, start, status, and the i'll push it and show how it exists in the pr metadata
+
+---
+
+i'm not going to narrateiit.  please give me a title and full ticket body for printing a file calle dhello world
+
+---
+
+Error: Invalid usage: unknown command "ticket" for "entire"

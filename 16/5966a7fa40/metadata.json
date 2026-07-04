@@ -5,16 +5,7 @@
   "strategy": "manual-commit",
   "branch": "feat/ticket-link",
   "checkpoints_count": 15,
-  "files_touched": [
-    "cmd/entire/cli/ticket/cmd.go",
-    "cmd/entire/cli/ticket/link.go",
-    "cmd/entire/cli/ticket/linkstore.go",
-    "cmd/entire/cli/ticket/linkstore_test.go",
-    "cmd/entire/cli/ticket/provider_resolve.go",
-    "docs/architecture/ticket-command-overview.md",
-    "docs/architecture/ticket-command.md",
-    "entire-dev"
-  ],
+  "files_touched": null,
   "sessions": [
     {
       "metadata": "/16/5966a7fa40/0/metadata.json",
@@ -35,15 +26,15 @@
       "transcript": "/16/5966a7fa40/2/full.jsonl",
       "compact_transcript": "/16/5966a7fa40/2/transcript.jsonl",
       "content_hash": "/16/5966a7fa40/2/content_hash.txt",
-      "prompt": ""
+      "prompt": "/16/5966a7fa40/2/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 78585,
-    "cache_creation_tokens": 2396429,
-    "cache_read_tokens": 136975643,
-    "output_tokens": 815665,
-    "api_call_count": 558
+    "input_tokens": 82869,
+    "cache_creation_tokens": 2413993,
+    "cache_read_tokens": 139002708,
+    "output_tokens": 827365,
+    "api_call_count": 572
   },
   "combined_attribution": {
     "calculated_at": "2026-07-04T03:01:48.834044Z",

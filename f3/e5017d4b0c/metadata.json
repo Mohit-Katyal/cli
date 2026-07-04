@@ -4,7 +4,7 @@
   "checkpoint_id": "f3e5017d4b0c",
   "strategy": "manual-commit",
   "branch": "feat/ticket-status",
-  "checkpoints_count": 4,
+  "checkpoints_count": 15,
   "files_touched": [
     "cmd/entire/cli/ticket/cmd.go",
     "cmd/entire/cli/ticket/link.go",
@@ -29,13 +29,20 @@
       "compact_transcript": "/f3/e5017d4b0c/1/transcript.jsonl",
       "content_hash": "/f3/e5017d4b0c/1/content_hash.txt",
       "prompt": ""
+    },
+    {
+      "metadata": "/f3/e5017d4b0c/2/metadata.json",
+      "transcript": "/f3/e5017d4b0c/2/full.jsonl",
+      "compact_transcript": "/f3/e5017d4b0c/2/transcript.jsonl",
+      "content_hash": "/f3/e5017d4b0c/2/content_hash.txt",
+      "prompt": "/f3/e5017d4b0c/2/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 37631,
-    "cache_creation_tokens": 1914807,
-    "cache_read_tokens": 112539623,
-    "output_tokens": 646874,
-    "api_call_count": 361
+    "input_tokens": 78738,
+    "cache_creation_tokens": 2406197,
+    "cache_read_tokens": 139334006,
+    "output_tokens": 823215,
+    "api_call_count": 570
   }
 }

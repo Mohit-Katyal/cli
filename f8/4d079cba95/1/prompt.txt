@@ -1,0 +1,19 @@
+feat(ticket): entire ticket link and unlink [3/8] #39
+All jobs
+Run details
+Annotations
+2 errors
+binary-size
+failed 1 minute ago in 13s
+Search logs
+0s
+11s
+0s
+Run bash scripts/check-pr-binaries.sh "${BASE_SHA}" "${HEAD_SHA}"
+Checking binary files in ceec6f040eb63bc1be493d8bfbee92b2dcdb1086...50da9874f8c82aebb9c26f6d87baac7d51dd83df
+Maximum allowed binary size: 1048576 bytes
+Oversized binary files detected:
+  - entire-dev (65854690 bytes)
+Error: Pull request includes binary files larger than 1048576 bytes.
+Error: Process completed with exit code 1.
+0s

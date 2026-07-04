@@ -4,7 +4,7 @@
   "checkpoint_id": "2444000380b9",
   "strategy": "manual-commit",
   "branch": "feat/ticket-setup",
-  "checkpoints_count": 4,
+  "checkpoints_count": 15,
   "files_touched": [
     "cmd/entire/cli/settings/settings.go",
     "cmd/entire/cli/ticket/cmd.go",
@@ -26,13 +26,20 @@
       "compact_transcript": "/24/44000380b9/1/transcript.jsonl",
       "content_hash": "/24/44000380b9/1/content_hash.txt",
       "prompt": ""
+    },
+    {
+      "metadata": "/24/44000380b9/2/metadata.json",
+      "transcript": "/24/44000380b9/2/full.jsonl",
+      "compact_transcript": "/24/44000380b9/2/transcript.jsonl",
+      "content_hash": "/24/44000380b9/2/content_hash.txt",
+      "prompt": "/24/44000380b9/2/prompt.txt"
     }
   ],
   "token_usage": {
-    "input_tokens": 37412,
-    "cache_creation_tokens": 1892679,
-    "cache_read_tokens": 108235283,
-    "output_tokens": 627027,
-    "api_call_count": 344
+    "input_tokens": 78519,
+    "cache_creation_tokens": 2384069,
+    "cache_read_tokens": 135029666,
+    "output_tokens": 803368,
+    "api_call_count": 553
   }
 }

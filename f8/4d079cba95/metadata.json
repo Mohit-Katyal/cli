@@ -4,7 +4,7 @@
   "checkpoint_id": "f84d079cba95",
   "strategy": "manual-commit",
   "branch": "feat/ticket-linear",
-  "checkpoints_count": 4,
+  "checkpoints_count": 15,
   "files_touched": [
     "cmd/entire/cli/ticket/start.go"
   ],
@@ -22,6 +22,13 @@
       "compact_transcript": "/f8/4d079cba95/1/transcript.jsonl",
       "content_hash": "/f8/4d079cba95/1/content_hash.txt",
       "prompt": "/f8/4d079cba95/1/prompt.txt"
+    },
+    {
+      "metadata": "/f8/4d079cba95/2/metadata.json",
+      "transcript": "/f8/4d079cba95/2/full.jsonl",
+      "compact_transcript": "/f8/4d079cba95/2/transcript.jsonl",
+      "content_hash": "/f8/4d079cba95/2/content_hash.txt",
+      "prompt": "/f8/4d079cba95/2/prompt.txt"
     }
   ],
   "token_usage": {

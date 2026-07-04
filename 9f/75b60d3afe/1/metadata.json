@@ -3,44 +3,42 @@
   "checkpoint_id": "9f75b60d3afe",
   "session_id": "20a8c439-9b01-402e-9831-9953f77a1dec",
   "strategy": "manual-commit",
-  "created_at": "2026-07-04T18:51:19.13997Z",
+  "created_at": "2026-07-04T18:51:33.191332Z",
   "branch": "feat/ticket-start",
   "checkpoints_count": 1,
   "files_touched": [
-    "cmd/entire/cli/root.go"
+    "cmd/entire/cli/root.go",
+    "cmd/entire/cli/ticket/branch.go",
+    "cmd/entire/cli/ticket/branch_test.go",
+    "cmd/entire/cli/ticket/cmd.go",
+    "cmd/entire/cli/ticket/cmd_test.go",
+    "cmd/entire/cli/ticket/start.go",
+    "cmd/entire/cli/ticket/start_test.go",
+    "cmd/entire/cli/ticket_bridge.go"
   ],
   "agent": "Claude Code",
   "model": "claude-opus-4-8[1m]",
   "turn_id": "92f2b71f698b",
-  "checkpoint_transcript_start": 235,
-  "transcript_lines_at_start": 235,
-  "compact_transcript_start": 52,
+  "checkpoint_transcript_start": 269,
+  "transcript_lines_at_start": 269,
+  "compact_transcript_start": 60,
   "token_usage": {
-    "input_tokens": 4371,
-    "cache_creation_tokens": 113377,
-    "cache_read_tokens": 630991,
-    "output_tokens": 10952,
-    "api_call_count": 7
+    "input_tokens": 0,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 0,
+    "output_tokens": 0,
+    "api_call_count": 0
   },
   "initial_attribution": {
-    "calculated_at": "2026-07-04T18:51:19.104655Z",
+    "calculated_at": "2026-07-04T18:51:33.159608Z",
     "agent_lines": 0,
     "agent_removed": 0,
-    "human_added": 441,
+    "human_added": 0,
     "human_modified": 0,
-    "human_removed": 0,
-    "total_committed": 441,
-    "total_lines_changed": 442,
+    "human_removed": 1,
+    "total_committed": 0,
+    "total_lines_changed": 1,
     "agent_percentage": 0,
     "metric_version": 2
-  },
-  "prompt_attributions": [
-    {
-      "checkpoint_number": 1,
-      "user_lines_added": 0,
-      "user_lines_removed": 0,
-      "agent_lines_added": 0,
-      "agent_lines_removed": 0
-    }
-  ]
+  }
 }

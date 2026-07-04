@@ -6,7 +6,14 @@
   "branch": "feat/ticket-start",
   "checkpoints_count": 15,
   "files_touched": [
-    "cmd/entire/cli/root.go"
+    "cmd/entire/cli/root.go",
+    "cmd/entire/cli/ticket/branch.go",
+    "cmd/entire/cli/ticket/branch_test.go",
+    "cmd/entire/cli/ticket/cmd.go",
+    "cmd/entire/cli/ticket/cmd_test.go",
+    "cmd/entire/cli/ticket/start.go",
+    "cmd/entire/cli/ticket/start_test.go",
+    "cmd/entire/cli/ticket_bridge.go"
   ],
   "sessions": [
     {
@@ -21,7 +28,7 @@
       "transcript": "/9f/75b60d3afe/1/full.jsonl",
       "compact_transcript": "/9f/75b60d3afe/1/transcript.jsonl",
       "content_hash": "/9f/75b60d3afe/1/content_hash.txt",
-      "prompt": "/9f/75b60d3afe/1/prompt.txt"
+      "prompt": ""
     },
     {
       "metadata": "/9f/75b60d3afe/2/metadata.json",
@@ -32,10 +39,10 @@
     }
   ],
   "token_usage": {
-    "input_tokens": 83089,
-    "cache_creation_tokens": 2513454,
-    "cache_read_tokens": 138257768,
-    "output_tokens": 829992,
-    "api_call_count": 567
+    "input_tokens": 78718,
+    "cache_creation_tokens": 2400077,
+    "cache_read_tokens": 137626777,
+    "output_tokens": 819040,
+    "api_call_count": 560
   }
 }
